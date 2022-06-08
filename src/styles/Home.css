@@ -1,0 +1,74 @@
+table {
+    /* background-color: rgba(0, 0, 0, 0.5); */
+    margin: auto;
+    padding: 20px;
+    width: 80%;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: rgba(150, 150, 150, 0.5);
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+thead tr {
+    background-color: black;
+    font-weight: bolder;
+}
+
+td {
+    padding: 10px;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+div {
+    text-align: center;
+}
+
+.imageArtwork {
+    height: 150px;
+}
+
+.properties {
+    width: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    margin: auto;
+    margin-top: 100px;
+    padding: 10px;
+    text-align: left;
+}
+
+.properties h2 {
+    /* text-align: center; */
+    margin-bottom: 30px;
+    text-decoration: underline;
+}
+
+.properties p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.properties li {
+    margin-top: 20px;
+}
+
+.properties span {
+    background-color: rgb(255, 255, 255);
+    padding: 1px 5px;
+    border-radius: 5px;
+    color: black;
+    margin: auto 5px;
+    font-weight: bolder;
+}
+
+.aboutUs {
+    margin: auto;
+    width: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    margin-top: 150px;
+    padding: 20px;
+}
