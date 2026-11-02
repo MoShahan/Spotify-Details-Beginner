@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { TopListsSkeleton } from '../components/home/TopListsSkeleton';
 import { useAuth } from '../contexts/auth';
@@ -100,11 +101,27 @@ function TopSongsList({ songs }: { songs: TopSong[] }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-[var(--cadence-fg)]">
-                  {song.name}
+                  <Link
+                    to={`/songs/${song.id}`}
+                    className="underline-offset-4 hover:underline"
+                  >
+                    {song.name}
+                  </Link>
                 </p>
                 <p className="truncate text-sm text-[var(--cadence-fg-muted)]">
-                  {song.artists.map((a) => a.name).join(', ') ||
-                    'Unknown artist'}
+                  {song.artists.length === 0
+                    ? 'Unknown artist'
+                    : song.artists.map((a, i) => (
+                        <span key={a.id}>
+                          {i > 0 ? ', ' : null}
+                          <Link
+                            to={`/artists/${a.id}`}
+                            className="underline-offset-4 hover:underline"
+                          >
+                            {a.name}
+                          </Link>
+                        </span>
+                      ))}
                 </p>
               </div>
               <span className="shrink-0 text-sm font-medium tabular-nums text-[var(--cadence-fg)]">
@@ -140,7 +157,12 @@ function TopArtistsList({ artists }: { artists: TopArtist[] }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-[var(--cadence-fg)]">
-                  {artist.name}
+                  <Link
+                    to={`/artists/${artist.id}`}
+                    className="underline-offset-4 hover:underline"
+                  >
+                    {artist.name}
+                  </Link>
                 </p>
                 <p className="text-sm text-[var(--cadence-fg-muted)]">
                   {artist.ratingCount}{' '}
