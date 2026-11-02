@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -5,6 +6,7 @@ import { CatalogSearch } from '../components/catalog/CatalogSearch';
 import { CatalogThumb } from '../components/catalog/CatalogThumb';
 import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
+import { buttonVariants } from '../components/ui/button';
 import { api, getApiErrorMessage } from '../lib/api';
 import {
   type CatalogSong,
@@ -13,6 +15,7 @@ import {
   type SortOrder,
 } from '../lib/catalog';
 import { nextSortState } from '../lib/sort';
+import { cn } from '../lib/utils';
 
 type LoadState =
   | { status: 'loading' }
@@ -69,13 +72,22 @@ export function SongsPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
-          Songs
-        </h1>
-        <p className="text-sm text-[var(--cadence-fg-muted)]">
-          Browse the catalog. Search, then click a column header to sort.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
+            Songs
+          </h1>
+          <p className="text-sm text-[var(--cadence-fg-muted)]">
+            Browse the catalog. Search, then click a column header to sort.
+          </p>
+        </div>
+        <Link
+          to="/songs/new"
+          className={cn(buttonVariants(), 'shrink-0 self-start sm:self-auto')}
+        >
+          <Plus className="size-4" aria-hidden />
+          New song
+        </Link>
       </div>
 
       <CatalogSearch
