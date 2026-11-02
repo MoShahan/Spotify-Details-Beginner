@@ -1,8 +1,8 @@
-# Cadence — Project Plan
+# Cadence - Project Plan
 
 **Cadence** is a personal full-stack music catalog app built to showcase production-quality skills: normalized SQL design, Express APIs, modern React UI, auth, ratings, image uploads, CI, and cloud deploy.
 
-This plan rebuilds the current codebase into a complete, professional product using [`question.md`](question.md) as the **product requirements** source and [`features-status.md`](features-status.md) as the gap list — framed as a portfolio app, not coursework.
+This plan rebuilds the current codebase into a complete, professional product using [`question.md`](question.md) as the **product requirements** source and [`features-status.md`](features-status.md) as the gap list - framed as a portfolio app, not coursework.
 
 **Status:** Planning. Name locked: **Cadence**. Ready for Phase 0 after DB hosting choice in §2.1 is confirmed.
 
@@ -23,7 +23,7 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 
 ## 2. Tech stack
 
-### Decision: Vite + React + Express + SQL — **TypeScript everywhere**
+### Decision: Vite + React + Express + SQL - **TypeScript everywhere**
 
 **Hard requirement:** Cadence is a **TypeScript** project end-to-end. No new app code in plain `.js` / `.jsx`.
 
@@ -31,7 +31,7 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | ----- | ------ | --- |
 | Language | **TypeScript (strict)** | Frontend + backend + shared types; `tsc --noEmit` in CI |
 | Frontend | **React + TypeScript + Vite** | `.tsx` components; typed hooks, props, API clients |
-| Why not Next | — | Keeps Express as the real backend on Render |
+| Why not Next | - | Keeps Express as the real backend on Render |
 | UI | **Tailwind CSS + shadcn/ui** | Polished dark / light themes |
 | Theme | Class-based light/dark toggle | Every page |
 | Data fetching | **TanStack Query** | Caching, errors, retries; typed query keys / responses |
@@ -41,7 +41,7 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | Backend | **Express + TypeScript** | Typed req/res via middleware; no Nest/Fastify/etc. |
 | Shared types | **`packages/shared` (optional)** or Zod schemas imported by API + web | One source of truth for DTOs |
 | ORM | **Prisma** | Generated TS client + migrations; MySQL or Postgres |
-| Database | **SQL (see §2.1)** | Normalized schema, join tables, FKs — not Mongo |
+| Database | **SQL (see §2.1)** | Normalized schema, join tables, FKs - not Mongo |
 | Auth | **JWT + bcrypt** | User name + email |
 | Images | **ImageKit** | Covers / CDN (no DIY S3) |
 | Frontend host | **Vercel** | |
@@ -52,12 +52,12 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | CI | **GitHub Actions** | Lint + typecheck + tests |
 | Notify | **Telegram** via GitHub Action | On Vercel production deploy |
 
-### 2.1 Database: MySQL vs Postgres vs Mongo — and how to host MySQL
+### 2.1 Database: MySQL vs Postgres vs Mongo - and how to host MySQL
 
 | Option | Fit for Cadence? | “Atlas-like” free host? | Verdict |
 | ------ | ---------------- | ----------------------- | ------- |
-| **MySQL** | Excellent for relational design | Weaker than Atlas/Neon — see below | Good if you want MySQL on the resume |
-| **PostgreSQL** | Excellent (same model) | **Neon** — closest to Atlas DX | Best *deploy* experience |
+| **MySQL** | Excellent for relational design | Weaker than Atlas/Neon - see below | Good if you want MySQL on the resume |
+| **PostgreSQL** | Excellent (same model) | **Neon** - closest to Atlas DX | Best *deploy* experience |
 | **MongoDB** | Weak for M2M + FKs + averages | Atlas | **Skip** for Cadence |
 
 **Mongo Atlas** = managed DB, no server for you.  
@@ -69,13 +69,13 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | Provider | Notes |
 | -------- | ----- |
 | **TiDB Cloud Serverless** | MySQL-compatible protocol; has a free/serverless tier; strong “connect string and go” story |
-| **Aiven for MySQL** | Managed MySQL; free trial / credits then paid — solid for demos |
+| **Aiven for MySQL** | Managed MySQL; free trial / credits then paid - solid for demos |
 | **Oracle Cloud Always Free** | Can run MySQL; more setup than Neon |
-| **DigitalOcean / AWS RDS / Azure MySQL** | Paid managed MySQL — fine if you budget for it |
-| **db4free / hobby free MySQL sites** | OK for toys; unreliable for a portfolio URL — avoid |
+| **DigitalOcean / AWS RDS / Azure MySQL** | Paid managed MySQL - fine if you budget for it |
+| **db4free / hobby free MySQL sites** | OK for toys; unreliable for a portfolio URL - avoid |
 | **Local MySQL only** | Great for dev; production API on Render still needs a reachable cloud DB |
 
-You said you **don’t use Railway** — plan does **not** depend on it.
+You said you **don’t use Railway** - plan does **not** depend on it.
 
 #### Practical recommendation for Cadence
 
@@ -89,9 +89,9 @@ Pick one:
 2. **Use Neon Postgres for deploy ease (recommended if hosting friction matters)**  
    - Same Express code, same Prisma models (swap `provider` + connection string)  
    - Neon ≈ Atlas for SQL  
-   - You are **not** learning a new backend — still Express; SQL skills transfer  
+   - You are **not** learning a new backend - still Express; SQL skills transfer  
 
-**Not recommended:** MongoDB — wrong data model for users ↔ ratings ↔ songs ↔ artists with averages and FKs.
+**Not recommended:** MongoDB - wrong data model for users ↔ ratings ↔ songs ↔ artists with averages and FKs.
 
 **Action:** Confirm **(1) MySQL + TiDB/Aiven** or **(2) Neon Postgres** before Phase 1 migrations.
 
@@ -119,13 +119,13 @@ cadence/
 └── README.md
 ```
 
-*(Alternative: `/client` + `/server` — same stack.)*
+*(Alternative: `/client` + `/server` - same stack.)*
 
 ### 2.2 Linting, formatting & pre-commit (project-wide)
 
 **Hard requirement:** The entire Cadence monorepo follows one ESLint + Prettier standard. New code must pass lint/format locally (via hooks) and in CI.
 
-#### ESLint — import ordering & grouping
+#### ESLint - import ordering & grouping
 
 Use ESLint (flat config) with an import plugin (e.g. `eslint-plugin-import` and/or `@typescript-eslint` + a dedicated order rule such as `simple-import-sort` or `import/order`).
 
@@ -140,7 +140,7 @@ Use ESLint (flat config) with an import plugin (e.g. `eslint-plugin-import` and/
 
 Also enforce: no unused imports, consistent type-only imports (`import type { … }`), and TypeScript-aware linting for `.ts` / `.tsx`.
 
-#### Prettier — entire project
+#### Prettier - entire project
 
 - One root **Prettier** config (`.prettierrc`) + `.prettierignore` (e.g. `dist`, `coverage`, Prisma generate output, lockfiles).  
 - Same print width, quotes, semicolons, trailing commas for **web + api + shared**.  
@@ -202,7 +202,7 @@ Install/setup in Phase 0: `husky`, `lint-staged`, `eslint`, Prettier, import-ord
 Workflow `.github/workflows/telegram-notify.yml`:
 
 - On Vercel production `deployment_status` = success  
-- Message: `✅ Cadence deployed — <url>` (+ commit SHA)  
+- Message: `✅ Cadence deployed - <url>` (+ commit SHA)  
 - Secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (bot already ready)  
 - Test once with `workflow_dispatch`
 
@@ -219,7 +219,7 @@ Workflow `.github/workflows/telegram-notify.yml`:
 | ImageKit dashboard | Keys, folders |
 | Browser MCP | Visual QA (themes) |
 
-**AI guidance files — yes:**
+**AI guidance files - yes:**
 
 | File | Purpose |
 | ---- | ------- |
@@ -245,7 +245,7 @@ Workflow `.github/workflows/telegram-notify.yml`:
 | Favicons | `favicon.ico`, 32px, apple-touch-icon |
 | OG image | 1200×630 for previews / README |
 | Cover placeholder | Empty-state artwork |
-| Color system | CSS variables; music-catalog look (e.g. ink + lime, or charcoal + amber) — avoid generic purple AI UI |
+| Color system | CSS variables; music-catalog look (e.g. ink + lime, or charcoal + amber) - avoid generic purple AI UI |
 
 ---
 
@@ -265,13 +265,13 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ---
 
-## 7. Features — build / revamp / quality
+## 7. Features - build / revamp / quality
 
 ### A. Must build (gaps)
 
 | # | Feature |
 | - | ------- |
-| A1 | Register / login (name, email) — replace hardcoded admin |
+| A1 | Register / login (name, email) - replace hardcoded admin |
 | A2 | Normalized DB + FKs + `song_artists` |
 | A3 | Per-user ratings 1–5 + true averages |
 | A4 | **Home**: Top 10 Songs + Top 10 Artists + rate + New Song |
@@ -304,7 +304,7 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 - Docker Compose (local API + DB)  
 - Search on Home  
-- GraphQL — skip unless spare time  
+- GraphQL - skip unless spare time  
 
 ---
 
@@ -333,7 +333,7 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 | Route | Page |
 | ----- | ---- |
 | `/login`, `/register` | Auth |
-| `/` | Home — Top 10 songs + artists, rate, New Song |
+| `/` | Home - Top 10 songs + artists, rate, New Song |
 | `/songs/new` | Add Song (+ Add Artist dialog) |
 | `/artists` | Optional full list |
 | `/about` | Optional |
@@ -361,7 +361,7 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ### `ci.yml`
 
-On PR + push to `main`: install → **lint** → **format:check (Prettier)** → typecheck → test → (optional) build. Fail on any step. Pre-commit hooks do not replace CI — CI still enforces ESLint import rules + Prettier on the full tree.
+On PR + push to `main`: install → **lint** → **format:check (Prettier)** → typecheck → test → (optional) build. Fail on any step. Pre-commit hooks do not replace CI - CI still enforces ESLint import rules + Prettier on the full tree.
 
 ### `telegram-notify.yml`
 
@@ -371,7 +371,7 @@ Vercel production deploy success → Telegram. Secrets: `TELEGRAM_BOT_TOKEN`, `T
 
 ## 12. Phases
 
-### Phase 0 — Prep
+### Phase 0 - Prep
 
 1. Brand everything **Cadence**  
 2. Confirm DB host (TiDB/Aiven MySQL **or** Neon)  
@@ -383,25 +383,25 @@ Vercel production deploy success → Telegram. Secrets: `TELEGRAM_BOT_TOKEN`, `T
 8. CI stubs: lint + Prettier check + **`tsc --noEmit`** + tests + `.env.example`  
 9. Document lint/format/hooks in `AGENTS.md`  
 
-### Phase 1 — API
+### Phase 1 - API
 
 Schema → auth → artists/songs/ratings → ImageKit → API tests  
 
-### Phase 2 — Web
+### Phase 2 - Web
 
 Theme → auth → Home → Add Song/Artist → toasts/errors → logo/favicons  
 
-### Phase 3 — Ship
+### Phase 3 - Ship
 
 1. Deploy API → Render; Web → Vercel  
 2. CORS + production env  
 3. Telegram notify workflow  
 4. Screenshots in repo root  
-5. **Final documentation pack** (see §13) — ERD, schema doc, architecture doc  
+5. **Final documentation pack** (see §13) - ERD, schema doc, architecture doc  
 6. **Rewrite README** for Cadence (setup, env, deploy, validations, links to docs)  
 7. Refresh `features-status.md` to all Done  
 
-### Phase 4 — Stretch
+### Phase 4 - Stretch
 
 Docker / Playwright / search  
 
@@ -409,11 +409,11 @@ Docker / Playwright / search
 
 ## 13. Final documentation (when the project is finished)
 
-Create these **after** features, tests, and deploy are stable — so diagrams match the real system. Link all of them from the final README.
+Create these **after** features, tests, and deploy are stable - so diagrams match the real system. Link all of them from the final README.
 
 | File | Purpose | Suggested format |
 | ---- | ------- | ---------------- |
-| **`docs/erd.md`** (or `docs/erd.mmd`) | Entity-Relationship Diagram — users, artists, songs, song_artists, ratings + cardinalities | Mermaid `erDiagram` in Markdown (renders on GitHub); optional PNG export in `docs/assets/` |
+| **`docs/erd.md`** (or `docs/erd.mmd`) | Entity-Relationship Diagram - users, artists, songs, song_artists, ratings + cardinalities | Mermaid `erDiagram` in Markdown (renders on GitHub); optional PNG export in `docs/assets/` |
 | **`docs/database-schema.md`** | Human-readable schema: tables, columns, types, PK/FK, indexes, unique constraints, rating rules | Markdown tables + notes; keep in sync with Prisma / SQL migrations |
 | **`docs/architecture.md`** | System architecture: Vite web → Express API → SQL DB; ImageKit; Vercel / Render; auth flow; CI / Telegram | Mermaid flowchart + short prose |
 | **`README.md`** | Full rewrite for Cadence | Install, env vars, scripts, demo login, validations, deploy map, **links to the three docs above** |
@@ -474,9 +474,9 @@ Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2**
 
 ### 14.4 Docs (finish line)
 
-- [ ] **14.4.1** `docs/erd.md` — ERD diagram  
-- [ ] **14.4.2** `docs/database-schema.md` — full schema reference  
-- [ ] **14.4.3** `docs/architecture.md` — project architecture  
+- [ ] **14.4.1** `docs/erd.md` - ERD diagram  
+- [ ] **14.4.2** `docs/database-schema.md` - full schema reference  
+- [ ] **14.4.3** `docs/architecture.md` - project architecture  
 - [ ] **14.4.4** Final **README** rewrite with links to those docs  
 - [ ] **14.4.5** `features-status.md` marked complete 
 
@@ -493,7 +493,7 @@ Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2**
 
 ## 16. Immediate next step
 
-1. **You:** Choose DB path — **MySQL via TiDB/Aiven** or **Neon Postgres** (Express either way).  
+1. **You:** Choose DB path - **MySQL via TiDB/Aiven** or **Neon Postgres** (Express either way).  
 2. **Then:** Phase 0 scaffold for **Cadence**.  
 3. **At the end:** ERD + database schema + architecture docs + full README update (§13).
 

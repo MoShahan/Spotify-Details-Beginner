@@ -1,4 +1,4 @@
-# Features Status — Present vs Pending
+# Features Status - Present vs Pending
 
 Comparison of the official DeltaX requirements in [`question.md`](question.md) against what this repository currently implements.
 
@@ -16,14 +16,14 @@ Comparison of the official DeltaX requirements in [`question.md`](question.md) a
 
 | Requirement | Status | Notes |
 | ----------- | ------ | ----- |
-| **Artist** — Name | Done | Stored as `artistsName` |
-| **Artist** — DOB | Done | Stored as `dob` |
-| **Artist** — Bio | Done | Stored as `bio`; collected in Add Artist modal |
-| **Song** — Name | Done | Stored as `songsName` |
-| **Song** — Date of Release | Done | Stored as `date` |
-| **Song** — Cover (image) | Partial | Filename string saved; image loaded from `src/artwork/`. No real file upload |
-| **User** — Name | Pending | No real User table/entity |
-| **User** — Email | Pending | No email field or registration |
+| **Artist** - Name | Done | Stored as `artistsName` |
+| **Artist** - DOB | Done | Stored as `dob` |
+| **Artist** - Bio | Done | Stored as `bio`; collected in Add Artist modal |
+| **Song** - Name | Done | Stored as `songsName` |
+| **Song** - Date of Release | Done | Stored as `date` |
+| **Song** - Cover (image) | Partial | Filename string saved; image loaded from `src/artwork/`. No real file upload |
+| **User** - Name | Pending | No real User table/entity |
+| **User** - Email | Pending | No email field or registration |
 
 ---
 
@@ -33,7 +33,7 @@ Comparison of the official DeltaX requirements in [`question.md`](question.md) a
 | ----------- | ------ | ----- |
 | Artist can sing multiple songs | Partial | Implied by CSV artist names on songs + frontend grouping; no proper DB link |
 | Song can be sung by multiple artists | Partial | Multi-select UI exists; artists saved as comma-separated string, not a join table |
-| Users can rate a song (1–5) | Partial | Star rating 1–5 exists, but rating is stored on the song row itself — not per user |
+| Users can rate a song (1–5) | Partial | Star rating 1–5 exists, but rating is stored on the song row itself - not per user |
 
 ---
 
@@ -48,7 +48,7 @@ Comparison of the official DeltaX requirements in [`question.md`](question.md) a
 | Top 10 Artists (by Avg Rating of their Songs) on Home | Partial | Exists on **`/artists`**, not combined on Home |
 | Artists show Name, DOB, Avg. Rating | Done | Artists page also shows their songs (extra) |
 
-**Current Home (`/home`)** only shows a “Properties of This App” explainer — not the Top 10 lists the brief asks for.
+**Current Home (`/home`)** only shows a “Properties of This App” explainer - not the Top 10 lists the brief asks for.
 
 ---
 
@@ -56,7 +56,7 @@ Comparison of the official DeltaX requirements in [`question.md`](question.md) a
 
 | Requirement | Status | Notes |
 | ----------- | ------ | ----- |
-| Screen to add a new Song with necessary fields | Done | `/add` — name, date, artwork, artists |
+| Screen to add a new Song with necessary fields | Done | `/add` - name, date, artwork, artists |
 | Select from existing Artists | Done | Multi-select dropdown from `GET /get/artists` |
 | Add new Artist from same screen (Ajax) | Done | Modal + `POST /add/artist` via axios (Ajax equivalent) |
 | Artist fields on modal: Name, DOB, Bio | Done | |
@@ -134,11 +134,11 @@ Comparison of the official DeltaX requirements in [`question.md`](question.md) a
 
 ### Yet to be done (pending / incomplete)
 
-1. **User entity** — Name + Email, real register/login  
-2. **Normalized DB** — `users`, `songs`, `artists`, `song_artists` join table, `ratings` table + foreign keys  
-3. **True average rating** — multiple users rating a song; display avg  
-4. **Combined Home screen** — Top 10 Songs + Top 10 Artists on one listing page (as in the mocks)  
-5. **Proper cover image handling** — upload (or reliable image path), not only a filename string  
+1. **User entity** - Name + Email, real register/login  
+2. **Normalized DB** - `users`, `songs`, `artists`, `song_artists` join table, `ratings` table + foreign keys  
+3. **True average rating** - multiple users rating a song; display avg  
+4. **Combined Home screen** - Top 10 Songs + Top 10 Artists on one listing page (as in the mocks)  
+5. **Proper cover image handling** - upload (or reliable image path), not only a filename string  
 6. **Complete DB scripts** in the repo  
 7. **Screenshots** in repo root  
 8. **Documented validations** in README  

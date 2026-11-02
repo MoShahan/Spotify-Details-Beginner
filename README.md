@@ -1,6 +1,6 @@
 # Cadence
 
-Personal full-stack music catalog — browse top songs and artists, rate tracks, and add new songs/artists. Built to showcase clean API design, SQL modeling, and a polished React UI.
+Personal full-stack music catalog - browse top songs and artists, rate tracks, and add new songs/artists. Built to showcase clean API design, SQL modeling, and a polished React UI.
 
 > Current app: Node.js + Express + MySQL + React. A full rebuild is planned in [`plan.md`](plan.md).  
 > In-app features are also summarized on the **Home** page after login.
@@ -29,13 +29,13 @@ Personal full-stack music catalog — browse top songs and artists, rate tracks,
 
 ## Features
 
-- **Login** — gated access with demo credentials
-- **Songs** — Top 10 by rating, artwork, release date, artists; rate 1–5 stars; See More / See Less
-- **Artists** — Top 10 by average song rating; DOB and song list
-- **Add New Song** — name, release date, artwork filename, multi-select artists
-- **Add New Artist** — modal on the Add Song page (name, DOB, bio)
-- **About Me** — developer details
-- **Logout** — return to login
+- **Login** - gated access with demo credentials
+- **Songs** - Top 10 by rating, artwork, release date, artists; rate 1–5 stars; See More / See Less
+- **Artists** - Top 10 by average song rating; DOB and song list
+- **Add New Song** - name, release date, artwork filename, multi-select artists
+- **Add New Artist** - modal on the Add Song page (name, DOB, bio)
+- **About Me** - developer details
+- **Logout** - return to login
 
 ---
 
@@ -63,7 +63,7 @@ Spotify-Details-Beginner/
 
 - [Node.js](https://nodejs.org/) (npm included)
 - [MySQL](https://www.mysql.com/) running locally
-- A MySQL schema named `spotify-db` (or change the name in config — see below)
+- A MySQL schema named `spotify-db` (or change the name in config - see below)
 
 ---
 
@@ -92,7 +92,7 @@ const db = mysql.createPool({
 
 ## Installation & Run
 
-You need **two terminals** — frontend and backend.
+You need **two terminals** - frontend and backend.
 
 ### 1. Backend (`songs-db`)
 
@@ -157,8 +157,8 @@ On **Add New Song**, the Artwork field expects a **filename with extension** (e.
 
 ## Related Docs
 
-- [`question.md`](question.md) — original DeltaX assignment brief  
-- [`features-status.md`](features-status.md) — what’s implemented vs still pending  
+- [`question.md`](question.md) - original DeltaX assignment brief  
+- [`features-status.md`](features-status.md) - what’s implemented vs still pending  
 
 ---
 
