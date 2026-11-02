@@ -17,6 +17,14 @@ export const createSongBodySchema = z.object({
     .string({ required_error: 'Release date is required' })
     .trim()
     .date('Release date must be a valid date (YYYY-MM-DD)'),
+  album: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .trim()
+      .max(200, 'Album must be at most 200 characters')
+      .optional(),
+  ),
   coverUrl: z.preprocess(
     emptyToUndefined,
     z
@@ -36,4 +44,21 @@ export const createSongBodySchema = z.object({
     .max(20, 'A song may link at most 20 artists'),
 });
 
+/** PATCH song cover (empty string clears). */
+export const updateSongCoverBodySchema = z.object({
+  coverUrl: z.preprocess(
+    (value) => {
+      if (value === '' || value === null) {
+        return null;
+      }
+      return value;
+    },
+    z.union([
+      z.string().trim().url('Cover URL must be a valid URL').max(2048),
+      z.null(),
+    ]),
+  ),
+});
+
 export type CreateSongBody = z.infer<typeof createSongBodySchema>;
+export type UpdateSongCoverBody = z.infer<typeof updateSongCoverBodySchema>;

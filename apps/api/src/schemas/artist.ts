@@ -29,6 +29,32 @@ export const createArtistBodySchema = z.object({
       .max(5000, 'Bio must be at most 5000 characters')
       .optional(),
   ),
+  imageUrl: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .trim()
+      .url('Image URL must be a valid URL')
+      .max(2048, 'Image URL must be at most 2048 characters')
+      .optional(),
+  ),
+});
+
+/** PATCH artist image (empty string clears). */
+export const updateArtistImageBodySchema = z.object({
+  imageUrl: z.preprocess(
+    (value) => {
+      if (value === '' || value === null) {
+        return null;
+      }
+      return value;
+    },
+    z.union([
+      z.string().trim().url('Image URL must be a valid URL').max(2048),
+      z.null(),
+    ]),
+  ),
 });
 
 export type CreateArtistBody = z.infer<typeof createArtistBodySchema>;
+export type UpdateArtistImageBody = z.infer<typeof updateArtistImageBodySchema>;
