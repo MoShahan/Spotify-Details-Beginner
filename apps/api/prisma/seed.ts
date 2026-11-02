@@ -167,6 +167,7 @@ async function main() {
   type SeedSong = {
     name: string;
     releaseDate: Date;
+    album: string | null;
     artistIds: string[];
   };
 
@@ -174,51 +175,61 @@ async function main() {
     {
       name: 'Wildflower',
       releaseDate: d('2024-05-17'),
+      album: 'Hit Me Hard and Soft',
       artistIds: [billie.id],
     },
     {
       name: 'Rap God',
       releaseDate: d('2013-10-15'),
+      album: 'The Marshall Mathers LP 2',
       artistIds: [eminem.id],
     },
     {
       name: 'Ishq (From "Lost;Found")',
       releaseDate: d('2024-03-09'),
+      album: 'Lost;Found',
       artistIds: [faheem.id, rauhan.id, amir.id],
     },
     {
       name: 'Stanga',
       releaseDate: d('2016-07-15'),
+      album: null,
       artistIds: [sagi.id, guy.id],
     },
     {
       name: 'Labon Ko',
       releaseDate: d('2007-09-03'),
+      album: 'Bhool Bhulaiyaa',
       artistIds: [kk.id],
     },
     {
       name: 'Main Yahaan Hoon',
       releaseDate: d('2004-09-18'),
+      album: 'Veer-Zaara',
       artistIds: [udit.id],
     },
     {
       name: 'Radioactive',
       releaseDate: d('2012-09-04'),
+      album: 'Night Visions',
       artistIds: [dragons.id],
     },
     {
       name: 'Tum Hi Ho',
       releaseDate: d('2013-03-16'),
+      album: 'Aashiqui 2',
       artistIds: [arijit.id],
     },
     {
       name: 'Pal Pal',
       releaseDate: d('2025-02-18'),
+      album: null,
       artistIds: [afusic.id, aliSoomro.id],
     },
     {
       name: 'Uska Hi Banana',
       releaseDate: d('2012-10-09'),
+      album: '1920: Evil Returns',
       artistIds: [arijit.id],
     },
   ];
@@ -229,6 +240,7 @@ async function main() {
       data: {
         name: entry.name,
         releaseDate: entry.releaseDate,
+        album: entry.album,
         createdByUserId: shahan.id,
         artists: {
           create: entry.artistIds.map((artistId) => ({ artistId })),

@@ -31,6 +31,8 @@ model Artist {
   name      String       @db.VarChar(150)
   dob       DateTime?    @db.Date
   bio       String?      @db.Text
+  // Optional portrait / press image (URL). ImageKit upload can fill this later.
+  imageUrl  String?      @map("image_url") @db.VarChar(2048)
   createdAt DateTime     @default(now()) @map("created_at")
   songs     SongArtist[]
 
@@ -42,6 +44,8 @@ model Song {
   id              String       @id @default(cuid()) @db.VarChar(191)
   name            String       @db.VarChar(200)
   releaseDate     DateTime     @map("release_date") @db.Date
+  // Optional album / project title - not required on create
+  album           String?      @db.VarChar(200)
   coverUrl        String?      @map("cover_url") @db.VarChar(2048)
   createdByUserId String       @map("created_by_user_id") @db.VarChar(191)
   createdAt       DateTime     @default(now()) @map("created_at")
@@ -53,6 +57,7 @@ model Song {
   @@index([createdByUserId])
   @@index([name])
   @@index([releaseDate])
+  @@index([album])
   @@map("songs")
 }
 
