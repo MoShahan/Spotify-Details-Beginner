@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { PasswordInput } from '../components/ui/password-input';
 import { useAuth } from '../contexts/auth';
 import {
   registerFormSchema,
@@ -90,9 +91,8 @@ export function RegisterPage() {
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="register-password">Password</Label>
-          <Input
+          <PasswordInput
             id="register-password"
-            type="password"
             autoComplete="new-password"
             aria-invalid={Boolean(errors.password)}
             {...register('password')}
