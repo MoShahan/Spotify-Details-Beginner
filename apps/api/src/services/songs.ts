@@ -211,6 +211,8 @@ export async function upsertSongRating(
     return null;
   }
 
+  const decimalValue = value.toFixed(1);
+
   const rating = await prisma.rating.upsert({
     where: {
       userId_songId: { userId, songId },
@@ -218,10 +220,10 @@ export async function upsertSongRating(
     create: {
       userId,
       songId,
-      value,
+      value: decimalValue,
     },
     update: {
-      value,
+      value: decimalValue,
     },
   });
 
