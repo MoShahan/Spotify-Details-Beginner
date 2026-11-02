@@ -173,7 +173,7 @@ Browser → Vercel (apps/web)
 
 ## Phase pointer
 
-See [`TODO.md`](TODO.md). Phase 0, **1.1**, **1.2**, and web **2.1–2.2** (shell + auth pages) are done. Next open API item: **1.3.1**; next web item: **2.3.1**.
+See [`TODO.md`](TODO.md). Phase 1 API and Phase 2 catalog UI (Home rate, New Song, About) are done. Next: Phase 3 deploy when ready.
 
 ## Cursor rules
 
