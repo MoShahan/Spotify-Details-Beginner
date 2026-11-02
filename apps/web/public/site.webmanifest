@@ -1,0 +1,27 @@
+{
+  "name": "Cadence",
+  "short_name": "Cadence",
+  "description": "Personal music catalog - rate songs, rank artists, add covers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8efe6",
+  "theme_color": "#10140f",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
