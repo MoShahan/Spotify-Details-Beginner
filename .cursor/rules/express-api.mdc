@@ -9,6 +9,7 @@ alwaysApply: false
 - Use Express + TypeScript only (no Nest/Fastify). **No `any`** - type req/res, Zod inputs, and Prisma results.
 - Structure: routers + middleware + services; keep `index`/`app` thin.
 - Validate bodies/params/queries with Zod; return a consistent JSON error shape.
+- Catalog uniqueness: API layer only (flexible rules). Current: duplicate artist **name** → `409 ARTIST_NAME_TAKEN`; song needs ≥1 artist; same song name + same artist set → `409 SONG_DUPLICATE`.
 - Auth: JWT + bcrypt; protect mutating catalog routes.
 - Register password (Zod): 8–24 chars, ≥1 uppercase, ≥1 lowercase, ≥1 number, ≥1 symbol. Login does not re-check complexity (only verify hash).
 - Use Prisma for DB access; no raw ad-hoc SQL unless justified.

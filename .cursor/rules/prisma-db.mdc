@@ -10,6 +10,8 @@ alwaysApply: false
 - Client uses `@prisma/adapter-mariadb`; generated client lives under `apps/api/src/generated/prisma`.
 - Normalized models only: `User`, `Artist`, `Song`, `SongArtist`, `Rating`.
 - `Song.releaseDate` and `Song.createdByUserId` are required; `Song.updatedAt` via `@updatedAt`.
+- Do **not** put evolving catalog uniqueness in DB `UNIQUE` (artist name, song title, etc.). Enforce in the API (`catalog-uniqueness`) so rules can change (name → name+DOB+nationality, song coupling, etc.). See README.
+- Current API rules: artist name collision → `409 ARTIST_NAME_TAKEN`; song create **≥1 artist**; same name + same artists → `409 SONG_DUPLICATE`. Artists may exist with zero songs. Index `artists.name` for lookups only.
 - Ratings: per-user value **1–5 allowing decimals** (`Decimal(2,1)`). **Zod + API must reject** values outside 1–5 (`VALIDATION_ERROR`). `@@unique([userId, songId])`. No rating column on `Song`.
 - Song↔Artist is M2M via join table - not CSV strings.
 - Prefer `onDelete: Restrict` (no cascade wipe). UI shows empty fallback strings when a related name/cover is missing.

@@ -1,12 +1,68 @@
 import { Router } from 'express';
 
+import { normalizeArtistIds } from '../lib/artist-ids.js';
 import { validateRequest } from '../middleware/validate.js';
 import {
   songIdParamsSchema,
   upsertRatingBodySchema,
 } from '../schemas/rating.js';
+import { createSongBodySchema } from '../schemas/song.js';
+import {
+  findMissingArtistIds,
+  findSongByNameAndArtistSet,
+} from '../services/catalog-uniqueness.js';
 
 export const songsRouter = Router();
+
+/**
+ * Create song + artist links.
+ * Requires at least one artist. Same title is allowed only when the artist set differs
+ * (sorted id compare). Duplicate title + same artists → 409.
+ * Full auth + insert lands in TODO 1.4.x; conflict / artist checks are enforced now.
+ */
+songsRouter.post(
+  '/',
+  validateRequest(createSongBodySchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = createSongBodySchema.parse(req.body);
+      const artistIds = normalizeArtistIds(body.artistIds);
+
+      const missing = await findMissingArtistIds(artistIds);
+      if (missing.length > 0) {
+        res.status(400).json({
+          error: {
+            code: 'ARTIST_NOT_FOUND',
+            message: 'One or more artist ids do not exist',
+            details: { missingArtistIds: missing },
+          },
+        });
+        return;
+      }
+
+      const duplicate = await findSongByNameAndArtistSet(body.name, artistIds);
+      if (duplicate) {
+        res.status(409).json({
+          error: {
+            code: 'SONG_DUPLICATE',
+            message:
+              'A song with this name and the same artist(s) already exists',
+          },
+        });
+        return;
+      }
+
+      res.status(401).json({
+        error: {
+          code: 'AUTH_REQUIRED',
+          message: 'Authentication required to create a song',
+        },
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  },
+);
 
 /**
  * Upsert rating for a song.

@@ -9,6 +9,7 @@ datasource db {
 
 // Domain models for Cadence.
 // Rating range 1–5 (decimals OK) enforced in Zod/API - not DB CHECK (TiDB/MySQL portability).
+// Catalog uniqueness (artists/songs) is API-enforced, not hard DB uniques, so rules can evolve.
 // FKs use onDelete: Restrict (no cascade wipe). UI shows empty fallbacks when a relation is missing.
 
 model User {
@@ -25,6 +26,8 @@ model User {
 
 model Artist {
   id        String       @id @default(cuid()) @db.VarChar(191)
+  // No DB unique on name - catalog uniqueness is enforced in the API so rules can change
+  // (e.g. name only today; later name + DOB + nationality) without a locking schema constraint.
   name      String       @db.VarChar(150)
   dob       DateTime?    @db.Date
   bio       String?      @db.Text

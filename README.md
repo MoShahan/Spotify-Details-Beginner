@@ -50,6 +50,20 @@ npm test
 
 Pre-commit (Husky → lint-staged): em-dash fix, ESLint `--fix`, Prettier on staged files.
 
+## Catalog rules (current)
+
+Uniqueness for artists/songs is enforced in the **API** (not locked as DB `UNIQUE` on business fields), so rules can change later without fighting the schema.
+
+- **Artists:** current rule - name must not already exist (`409 ARTIST_NAME_TAKEN`). DOB is optional. Artists may exist with **zero** songs.
+- **Songs:** current rule - at least one artist on create. Same title OK when the artist set differs. Same title + same artists (ids sorted then compared) → `409 SONG_DUPLICATE`.
+
+Structural uniques that stay in the DB: `users.email`, `ratings (user_id, song_id)`, and M2M PK on `song_artists`.
+
+## Coming soon / flexible identity
+
+- **Artist identity:** may move to name + DOB, and later fields such as nationality (or other attributes), without relying on today's name-only rule being baked into the database.
+- **Song / artist coupling:** rules around whether creating an artist requires a song (or vice versa) can change in the API; the schema already allows artists without songs and songs with one or more artists.
+
 ## Docs
 
 - [`question.md`](question.md) - product requirements

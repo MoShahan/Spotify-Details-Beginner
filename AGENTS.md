@@ -128,7 +128,7 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 3. **No em dashes (`-`)** - use hyphen (`-`). Enforced by `cadence/no-em-dash` + `scripts/fix-em-dash.mjs` on commit.
 4. **API** - routers + middleware; consistent JSON error shape; validate inputs with Zod.
 5. **Web** - light/dark on every page; **mobile responsive** (phone → desktop); **skeleton loaders** while fetching (never circular spinners); empty / error states; toasts via Sonner.
-6. **DB** - normalized schema (`users`, `artists`, `songs`, `song_artists`, `ratings`); no denormalized CSV artists or rating-on-song-row.
+6. **DB** - normalized schema (`users`, `artists`, `songs`, `song_artists`, `ratings`); no denormalized CSV artists or rating-on-song-row. Keep catalog uniqueness in the **API** (not hard DB uniques on artist/song names) so rules can evolve. Current rules + Coming soon: see README.
 7. **Don’t** bypass pre-commit with `--no-verify` in normal workflow.
 8. **Don’t** expand scope into plan §15 (out of scope) unless the user asks.
 
