@@ -15,6 +15,11 @@ export type CatalogSong = {
   artists: SongArtistRef[];
 };
 
+/** Song detail includes the signed-in user's rating when present. */
+export type SongDetail = CatalogSong & {
+  myRating: number | null;
+};
+
 export type CatalogArtist = {
   id: string;
   name: string;
@@ -25,17 +30,20 @@ export type CatalogArtist = {
   ratingCount: number;
 };
 
+export type ArtistDetailSong = {
+  id: string;
+  name: string;
+  releaseDate: string;
+  releaseYear: number;
+  album: string | null;
+  coverUrl: string | null;
+  averageRating: number | null;
+  ratingCount: number;
+  artists: SongArtistRef[];
+};
+
 export type ArtistDetail = CatalogArtist & {
-  songs: Array<{
-    id: string;
-    name: string;
-    releaseDate: string;
-    releaseYear: number;
-    album: string | null;
-    coverUrl: string | null;
-    averageRating: number | null;
-    ratingCount: number;
-  }>;
+  songs: ArtistDetailSong[];
 };
 
 export type TopSong = CatalogSong;
