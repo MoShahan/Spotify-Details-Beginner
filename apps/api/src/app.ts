@@ -6,6 +6,7 @@ import { artistsRouter } from './routes/artists.js';
 import { authRouter } from './routes/auth.js';
 import { healthRouter } from './routes/health.js';
 import { songsRouter } from './routes/songs.js';
+import { uploadsRouter } from './routes/uploads.js';
 
 export function createApp() {
   const app = express();
@@ -21,6 +22,7 @@ export function createApp() {
   app.use('/auth', authRouter);
   app.use('/artists', artistsRouter);
   app.use('/songs', songsRouter);
+  app.use('/uploads', uploadsRouter);
 
   app.use((_req, res) => {
     res.status(404).json({
