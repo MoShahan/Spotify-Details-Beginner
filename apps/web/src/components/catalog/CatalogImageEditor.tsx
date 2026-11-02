@@ -151,15 +151,6 @@ export function CatalogImageEditor({
         </div>
       </div>
 
-      {!editing && currentUrl ? (
-        <p
-          className="truncate text-xs text-[var(--cadence-fg-muted)]"
-          title={currentUrl}
-        >
-          {currentUrl}
-        </p>
-      ) : null}
-
       {editing ? (
         <form
           className="cadence-panel flex flex-col gap-3 p-3"
