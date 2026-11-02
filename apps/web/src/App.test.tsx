@@ -6,20 +6,21 @@ import App from './App';
 
 vi.mock('./lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ data: { status: 'ok' } }),
+    get: vi.fn().mockRejectedValue(new Error('no session')),
+    post: vi.fn(),
   },
+  getApiErrorMessage: () => 'error',
 }));
 
-describe('App', () => {
-  it('renders Cadence brand', () => {
+describe('App shell', () => {
+  it('shows Cadence brand and login on public routes', async () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/login']}>
         <App />
       </MemoryRouter>,
     );
 
-    expect(
-      screen.getByRole('heading', { name: 'Cadence' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Cadence')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Log in' })).toBeInTheDocument();
   });
 });

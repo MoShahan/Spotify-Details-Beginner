@@ -1,15 +1,40 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  color-scheme: light dark;
-  --cadence-ink: #0f1419;
-  --cadence-lime: #c8f135;
-  --cadence-mist: #e8efe6;
-  font-family: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+  --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+
+  --cadence-bg: #e8efe6;
+  --cadence-surface: #f4f7f2;
+  --cadence-fg: #0f1419;
+  --cadence-fg-muted: #4a5560;
+  --cadence-muted: #d5ddd2;
+  --cadence-border: #b8c4b4;
+  --cadence-accent: #c8f135;
+  --cadence-accent-fg: #152010;
+  --cadence-ring: #8aa61f;
+
+  font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
-  background: var(--cadence-mist);
-  color: var(--cadence-ink);
+  background: var(--cadence-bg);
+  color: var(--cadence-fg);
+}
+
+.dark {
+  color-scheme: dark;
+  --cadence-bg: #10140f;
+  --cadence-surface: #1a2118;
+  --cadence-fg: #eef3ea;
+  --cadence-fg-muted: #9aa894;
+  --cadence-muted: #2a3328;
+  --cadence-border: #3a4537;
+  --cadence-accent: #c8f135;
+  --cadence-accent-fg: #152010;
+  --cadence-ring: #c8f135;
 }
 
 * {
@@ -20,6 +45,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--cadence-bg);
+  color: var(--cadence-fg);
 }
 
 #root {

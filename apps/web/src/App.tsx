@@ -1,65 +1,38 @@
-import { useEffect, useState } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
-import { api } from './lib/api';
-
-function HomePage() {
-  const [apiStatus, setApiStatus] = useState<'loading' | 'ok' | 'down'>(
-    'loading',
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-
-    api
-      .get<{ status: string }>('/health')
-      .then((res) => {
-        if (!cancelled) {
-          setApiStatus(res.data.status === 'ok' ? 'ok' : 'down');
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setApiStatus('down');
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-16">
-      <p className="text-sm uppercase tracking-[0.2em] text-neutral-600">
-        Music catalog
-      </p>
-      <h1 className="text-5xl font-semibold tracking-tight text-[var(--cadence-ink)] sm:text-6xl">
-        Cadence
-      </h1>
-      <p className="max-w-xl text-lg text-neutral-700">
-        Rate the rhythm. Rank the artists. Phase 0 scaffold is live - Vite +
-        React + TypeScript on the web, Express + Prisma on the API.
-      </p>
-      <p className="text-sm text-neutral-600">
-        API:{' '}
-        {apiStatus === 'loading'
-          ? 'checking…'
-          : apiStatus === 'ok'
-            ? 'connected'
-            : 'offline (start cadence-api)'}
-      </p>
-      <Link className="text-sm underline underline-offset-4" to="/">
-        Home
-      </Link>
-    </main>
-  );
-}
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { SessionGate } from './components/auth/SessionGate';
+import { AppShell } from './components/layout/AppShell';
+import { AuthProvider } from './contexts/auth';
+import { ThemeProvider } from './contexts/theme';
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-    </Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <SessionGate>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+          <Toaster richColors position="top-center" closeButton />
+        </SessionGate>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
