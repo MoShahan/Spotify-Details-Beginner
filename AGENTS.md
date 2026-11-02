@@ -138,10 +138,11 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 
 ```text
 users          id, name, email unique, password_hash, created_at
-artists        id, name, dob, bio, created_at
-songs          id, name, release_date, cover_url, created_by_user_id, created_at
+artists        id, name, dob, bio, image_url optional, created_at
+songs          id, name, release_date, album optional, cover_url, created_by_user_id, created_at
 song_artists   song_id, artist_id (M2M)
 ratings        user_id, song_id, value 1..5 decimals OK (unique per user+song)
+# release year for sorting/display is derived from release_date (no separate column)
 ```
 
 Song average = `AVG(ratings.value)`. Artist average = documented rule in README / schema docs (song avgs or all ratings on their songs).
