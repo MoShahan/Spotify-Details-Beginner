@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 
+import { errorHandler } from './middleware/error-handler.js';
 import { artistsRouter } from './routes/artists.js';
+import { authRouter } from './routes/auth.js';
 import { healthRouter } from './routes/health.js';
 import { songsRouter } from './routes/songs.js';
 
@@ -16,6 +18,7 @@ export function createApp() {
   app.use(express.json());
 
   app.use('/health', healthRouter);
+  app.use('/auth', authRouter);
   app.use('/artists', artistsRouter);
   app.use('/songs', songsRouter);
 
@@ -24,6 +27,8 @@ export function createApp() {
       error: { code: 'NOT_FOUND', message: 'Route not found' },
     });
   });
+
+  app.use(errorHandler);
 
   return app;
 }
