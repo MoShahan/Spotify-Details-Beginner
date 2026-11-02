@@ -7,8 +7,8 @@ datasource db {
   provider = "mysql"
 }
 
-// Phase 1 will flesh out relations, indexes, and seed.
-// Scaffold models match Cadence normalized domain.
+// Domain models for Cadence. Rating range 1–5 (decimals allowed) enforced in Zod/API.
+// No onDelete Cascade: Restrict so related rows are not wiped; UI shows empty fallback when a relation is missing.
 
 model User {
   id           String   @id @default(cuid())
@@ -36,24 +36,27 @@ model Artist {
 model Song {
   id              String       @id @default(cuid())
   name            String
-  releaseDate     DateTime?    @map("release_date") @db.Date
+  releaseDate     DateTime     @map("release_date") @db.Date
   coverUrl        String?      @map("cover_url")
-  createdByUserId String?      @map("created_by_user_id")
+  createdByUserId String       @map("created_by_user_id")
   createdAt       DateTime     @default(now()) @map("created_at")
-  createdBy       User?        @relation(fields: [createdByUserId], references: [id])
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  createdBy       User         @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
   artists         SongArtist[]
   ratings         Rating[]
 
+  @@index([createdByUserId])
   @@map("songs")
 }
 
 model SongArtist {
   songId   String @map("song_id")
   artistId String @map("artist_id")
-  song     Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
-  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  song     Song   @relation(fields: [songId], references: [id], onDelete: Restrict)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Restrict)
 
   @@id([songId, artistId])
+  @@index([artistId])
   @@map("song_artists")
 }
 
@@ -61,11 +64,13 @@ model Rating {
   id        String   @id @default(cuid())
   userId    String   @map("user_id")
   songId    String   @map("song_id")
-  value     Int
+  value     Decimal  @db.Decimal(2, 1)
   createdAt DateTime @default(now()) @map("created_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Restrict)
 
   @@unique([userId, songId])
+  @@index([songId])
+  @@index([userId])
   @@map("ratings")
 }
