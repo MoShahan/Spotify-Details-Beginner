@@ -64,7 +64,7 @@ export function HomePage() {
 
       {state.status === 'error' ? (
         <div
-          className="rounded-md border border-[var(--cadence-border)] bg-[var(--cadence-surface)] px-4 py-6 text-sm text-[var(--cadence-fg-muted)]"
+          className="cadence-panel px-4 py-6 text-sm text-[var(--cadence-fg-muted)]"
           role="alert"
         >
           {state.message}
@@ -83,14 +83,14 @@ export function HomePage() {
 
 function TopSongsList({ songs }: { songs: TopSong[] }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="cadence-panel flex flex-col gap-4 p-4 sm:p-5">
       <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
         Top 10 Songs
       </h2>
       {songs.length === 0 ? (
         <p className="text-sm text-[var(--cadence-fg-muted)]">No songs yet.</p>
       ) : (
-        <ol className="flex flex-col gap-2">
+        <ol className="flex flex-col">
           {songs.map((song, index) => (
             <li
               key={song.id}
@@ -137,7 +137,7 @@ function TopSongsList({ songs }: { songs: TopSong[] }) {
 
 function TopArtistsList({ artists }: { artists: TopArtist[] }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="cadence-panel flex flex-col gap-4 p-4 sm:p-5">
       <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
         Top 10 Artists
       </h2>
@@ -146,7 +146,7 @@ function TopArtistsList({ artists }: { artists: TopArtist[] }) {
           No artists yet.
         </p>
       ) : (
-        <ol className="flex flex-col gap-2">
+        <ol className="flex flex-col">
           {artists.map((artist, index) => (
             <li
               key={artist.id}

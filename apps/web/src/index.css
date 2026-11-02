@@ -7,15 +7,20 @@
   --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
 
-  --cadence-bg: #e8efe6;
-  --cadence-surface: #f4f7f2;
-  --cadence-fg: #0f1419;
-  --cadence-fg-muted: #4a5560;
-  --cadence-muted: #d5ddd2;
-  --cadence-border: #b8c4b4;
+  --cadence-bg: #e6ede3;
+  --cadence-surface: #fbfcf9;
+  --cadence-fg: #121812;
+  --cadence-fg-muted: #5a6558;
+  --cadence-muted: #e0e7dc;
+  --cadence-border: color-mix(in srgb, #1a2418 12%, transparent);
   --cadence-accent: #c8f135;
   --cadence-accent-fg: #152010;
-  --cadence-ring: #8aa61f;
+  --cadence-ring: color-mix(in srgb, #8aa61f 55%, transparent);
+  --cadence-radius: 0.5rem;
+  --cadence-shadow:
+    0 1px 2px color-mix(in srgb, #10140f 6%, transparent),
+    0 4px 14px color-mix(in srgb, #10140f 5%, transparent);
+  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #10140f 5%, transparent);
 
   font-family: var(--font-body);
   line-height: 1.5;
@@ -26,15 +31,19 @@
 
 .dark {
   color-scheme: dark;
-  --cadence-bg: #10140f;
-  --cadence-surface: #1a2118;
+  --cadence-bg: #0e120d;
+  --cadence-surface: #171d15;
   --cadence-fg: #eef3ea;
   --cadence-fg-muted: #9aa894;
-  --cadence-muted: #2a3328;
-  --cadence-border: #3a4537;
+  --cadence-muted: #252d23;
+  --cadence-border: color-mix(in srgb, #eef3ea 12%, transparent);
   --cadence-accent: #c8f135;
   --cadence-accent-fg: #152010;
-  --cadence-ring: #c8f135;
+  --cadence-ring: color-mix(in srgb, #c8f135 45%, transparent);
+  --cadence-shadow:
+    0 1px 2px color-mix(in srgb, #000 45%, transparent),
+    0 8px 24px color-mix(in srgb, #000 35%, transparent);
+  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #000 40%, transparent);
 }
 
 * {
@@ -45,10 +54,53 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--cadence-bg);
+  background:
+    radial-gradient(
+      1200px 600px at 10% -10%,
+      color-mix(in srgb, var(--cadence-accent) 10%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 500px at 100% 0%,
+      color-mix(in srgb, var(--cadence-muted) 55%, transparent),
+      transparent 50%
+    ),
+    var(--cadence-bg);
   color: var(--cadence-fg);
 }
 
 #root {
   min-height: 100vh;
+}
+
+.cadence-panel {
+  border: 1px solid var(--cadence-border);
+  border-radius: var(--cadence-radius);
+  background: var(--cadence-surface);
+  box-shadow: var(--cadence-shadow);
+}
+
+.cadence-field {
+  border: 1px solid var(--cadence-border);
+  border-radius: var(--cadence-radius);
+  background: var(--cadence-surface);
+  box-shadow: var(--cadence-shadow-sm);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cadence-field:hover:not(:disabled):not(:focus-visible) {
+  border-color: color-mix(in srgb, var(--cadence-fg) 22%, transparent);
+}
+
+.cadence-field:focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--cadence-accent) 70%,
+    var(--cadence-border)
+  );
+  box-shadow:
+    var(--cadence-shadow-sm),
+    0 0 0 3px var(--cadence-ring);
 }

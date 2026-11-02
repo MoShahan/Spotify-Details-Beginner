@@ -97,7 +97,7 @@ export function SongDetailPage() {
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
         <div className="flex flex-col gap-4">
-          <div className="aspect-square overflow-hidden rounded-md border border-[var(--cadence-border)] bg-[var(--cadence-surface)]">
+          <div className="cadence-panel aspect-square overflow-hidden">
             {song.coverUrl ? (
               <img
                 src={song.coverUrl}
@@ -165,7 +165,7 @@ export function SongDetailPage() {
       </div>
 
       <section
-        className="rounded-md border border-[var(--cadence-border)] bg-[var(--cadence-surface)] p-4 sm:p-5"
+        className="cadence-panel p-4 sm:p-5"
         aria-labelledby="song-lyrics-heading"
       >
         <h2

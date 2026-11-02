@@ -4,14 +4,14 @@ import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '../../lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 rounded-[var(--cadence-radius)] text-sm font-medium transition-[opacity,background-color,box-shadow,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         default:
-          'bg-[var(--cadence-accent)] text-[var(--cadence-accent-fg)] hover:opacity-90',
+          'bg-[var(--cadence-accent)] text-[var(--cadence-accent-fg)] shadow-[var(--cadence-shadow-sm)] hover:opacity-90',
         secondary:
-          'border border-[var(--cadence-border)] bg-transparent text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]',
+          'border border-[var(--cadence-border)] bg-[var(--cadence-surface)] text-[var(--cadence-fg)] shadow-[var(--cadence-shadow-sm)] hover:bg-[var(--cadence-muted)]',
         ghost: 'text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]',
       },
       size: {

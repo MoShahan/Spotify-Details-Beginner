@@ -20,7 +20,7 @@ export function PasswordInput({
         type={visible ? 'text' : 'password'}
         disabled={disabled}
         className={cn(
-          'flex h-10 w-full rounded-md border border-[var(--cadence-border)] bg-[var(--cadence-surface)] py-2 pr-10 pl-3 text-sm text-[var(--cadence-fg)] placeholder:text-[var(--cadence-fg-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:cursor-not-allowed disabled:opacity-50',
+          'cadence-field flex h-10 w-full py-2 pr-10 pl-3 text-sm text-[var(--cadence-fg)] placeholder:text-[var(--cadence-fg-muted)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}
         {...props}
@@ -28,7 +28,7 @@ export function PasswordInput({
       <button
         type="button"
         disabled={disabled}
-        className="absolute top-1/2 right-1 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)] hover:text-[var(--cadence-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:pointer-events-none disabled:opacity-50"
+        className="absolute top-1/2 right-1 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-[calc(var(--cadence-radius)-2px)] text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)] hover:text-[var(--cadence-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:pointer-events-none disabled:opacity-50"
         aria-label={visible ? 'Hide password' : 'Show password'}
         aria-pressed={visible}
         onClick={() => {

@@ -83,9 +83,9 @@ export function SongsPage() {
         searchPlaceholder="Search title, artist, album, year..."
       />
 
-      <div className="overflow-x-auto rounded-md border border-[var(--cadence-border)]">
+      <div className="cadence-panel overflow-x-auto">
         <table className="w-full min-w-[40rem] border-collapse text-sm">
-          <thead className="bg-[var(--cadence-surface)]">
+          <thead className="bg-[var(--cadence-muted)]/45">
             <tr>
               <SortableTh
                 label="Name"
@@ -156,7 +156,7 @@ export function SongsPage() {
               ? state.songs.map((song) => (
                   <tr
                     key={song.id}
-                    className="odd:bg-transparent even:bg-[var(--cadence-surface)]/50"
+                    className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
                   >
                     <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">
                       <Link

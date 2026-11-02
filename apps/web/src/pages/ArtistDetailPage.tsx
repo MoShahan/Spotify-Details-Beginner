@@ -113,7 +113,7 @@ export function ArtistDetailPage() {
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
         <div className="flex flex-col gap-4">
-          <div className="aspect-square overflow-hidden rounded-md border border-[var(--cadence-border)] bg-[var(--cadence-surface)]">
+          <div className="cadence-panel aspect-square overflow-hidden">
             {artist.imageUrl ? (
               <img
                 src={artist.imageUrl}
@@ -172,12 +172,12 @@ export function ArtistDetailPage() {
             No songs linked yet.
           </p>
         ) : (
-          <ul className="divide-y divide-[var(--cadence-border)] rounded-md border border-[var(--cadence-border)]">
+          <ul className="cadence-panel divide-y divide-[var(--cadence-border)] overflow-hidden">
             {artist.songs.map((song) => (
               <li key={song.id}>
                 <Link
                   to={`/songs/${song.id}`}
-                  className="flex items-center justify-between gap-3 px-3 py-3 hover:bg-[var(--cadence-muted)]"
+                  className="flex items-center justify-between gap-3 px-3 py-3 transition-colors hover:bg-[var(--cadence-muted)]/55"
                 >
                   <span className="min-w-0 truncate font-medium">
                     {song.name}

@@ -43,7 +43,7 @@ export function RegisterPage() {
   }
 
   return (
-    <section className="mx-auto w-full max-w-md">
+    <section className="cadence-panel mx-auto w-full max-w-md p-6 sm:p-8">
       <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
         Sign up
       </h1>
