@@ -229,7 +229,7 @@ async function main() {
       data: {
         name: entry.name,
         releaseDate: entry.releaseDate,
-        createdByUserId: demo.id,
+        createdByUserId: shahan.id,
         artists: {
           create: entry.artistIds.map((artistId) => ({ artistId })),
         },
