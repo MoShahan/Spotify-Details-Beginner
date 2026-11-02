@@ -7,14 +7,15 @@ datasource db {
   provider = "mysql"
 }
 
-// Domain models for Cadence. Rating range 1–5 (decimals allowed) enforced in Zod/API.
-// No onDelete Cascade: Restrict so related rows are not wiped; UI shows empty fallback when a relation is missing.
+// Domain models for Cadence.
+// Rating range 1–5 (decimals OK) enforced in Zod/API - not DB CHECK (TiDB/MySQL portability).
+// FKs use onDelete: Restrict (no cascade wipe). UI shows empty fallbacks when a relation is missing.
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String   @map("password_hash")
+  id           String   @id @default(cuid()) @db.VarChar(191)
+  name         String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
   createdAt    DateTime @default(now()) @map("created_at")
   songs        Song[]
   ratings      Rating[]
@@ -23,22 +24,23 @@ model User {
 }
 
 model Artist {
-  id        String       @id @default(cuid())
-  name      String
+  id        String       @id @default(cuid()) @db.VarChar(191)
+  name      String       @db.VarChar(150)
   dob       DateTime?    @db.Date
   bio       String?      @db.Text
   createdAt DateTime     @default(now()) @map("created_at")
   songs     SongArtist[]
 
+  @@index([name])
   @@map("artists")
 }
 
 model Song {
-  id              String       @id @default(cuid())
-  name            String
+  id              String       @id @default(cuid()) @db.VarChar(191)
+  name            String       @db.VarChar(200)
   releaseDate     DateTime     @map("release_date") @db.Date
-  coverUrl        String?      @map("cover_url")
-  createdByUserId String       @map("created_by_user_id")
+  coverUrl        String?      @map("cover_url") @db.VarChar(2048)
+  createdByUserId String       @map("created_by_user_id") @db.VarChar(191)
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @updatedAt @map("updated_at")
   createdBy       User         @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
@@ -46,12 +48,14 @@ model Song {
   ratings         Rating[]
 
   @@index([createdByUserId])
+  @@index([name])
+  @@index([releaseDate])
   @@map("songs")
 }
 
 model SongArtist {
-  songId   String @map("song_id")
-  artistId String @map("artist_id")
+  songId   String @map("song_id") @db.VarChar(191)
+  artistId String @map("artist_id") @db.VarChar(191)
   song     Song   @relation(fields: [songId], references: [id], onDelete: Restrict)
   artist   Artist @relation(fields: [artistId], references: [id], onDelete: Restrict)
 
@@ -61,9 +65,9 @@ model SongArtist {
 }
 
 model Rating {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  songId    String   @map("song_id")
+  id        String   @id @default(cuid()) @db.VarChar(191)
+  userId    String   @map("user_id") @db.VarChar(191)
+  songId    String   @map("song_id") @db.VarChar(191)
   value     Decimal  @db.Decimal(2, 1)
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
