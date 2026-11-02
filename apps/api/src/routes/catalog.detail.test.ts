@@ -42,6 +42,7 @@ describe('Catalog detail + image PATCH routes', () => {
       expect(detail.status).toBe(200);
       expect(detail.body.song.name).toBe('Wildflower');
       expect(detail.body.song.artists.length).toBeGreaterThan(0);
+      expect(detail.body.song).toHaveProperty('myRating');
 
       const coverUrl = 'https://example.com/test-cover.jpg';
       const patched = await request(app)
