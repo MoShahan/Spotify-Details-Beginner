@@ -6,14 +6,15 @@ alwaysApply: false
 
 # React web (`apps/web`)
 
-- Vite + React + TypeScript. Tailwind + shadcn/ui. React Router for pages.
+- Vite + React + TypeScript (**no `any`** - fully type-safe). Tailwind + shadcn/ui. React Router for pages.
 - Data: **Axios only** (shared API client with `VITE_API_URL` + auth header). No TanStack Query. Forms: React Hook Form + Zod (`z.infer<>`). Toasts: Sonner.
 - Every page supports light/dark (class-based theme toggle).
 - **Mobile responsive** is required: usable at ~375px and up; stack/nav/forms/modals must work on phones (no desktop-only UI).
 - While fetching data, use **skeleton loaders** (shadcn `Skeleton` or equivalent). **Do not** use circular spinners.
 - Include empty and error states for catalog views.
 - Call the API via `VITE_API_URL` only; never put secrets in `VITE_*`.
-- Prefer composition over card-heavy clutter; match Cadence branding (not generic purple AI UI).
+- Match Cadence branding (not generic purple AI UI). Prefer composition over card-heavy clutter.
+- Remove unused starter **boilerplate** (Vite demo assets/CSS/README, unused template files).
 
 ```tsx
 // ✅ Typed form values from Zod

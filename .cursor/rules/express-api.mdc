@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Express API (`apps/api`)
 
-- Use Express + TypeScript only (no Nest/Fastify).
+- Use Express + TypeScript only (no Nest/Fastify). **No `any`** - type req/res, Zod inputs, and Prisma results.
 - Structure: routers + middleware + services; keep `index`/`app` thin.
 - Validate bodies/params/queries with Zod; return a consistent JSON error shape.
 - Auth: JWT + bcrypt; protect mutating catalog routes.

@@ -6,7 +6,8 @@ alwaysApply: true
 # Cadence core
 
 - Read `AGENTS.md` and `plan.md` first. Honor checklist IDs (e.g. **14.2.3**).
-- Locked: monorepo `apps/web` + `apps/api`; TypeScript strict; Express + Prisma MySQL (TiDB); Vite React; ImageKit; Vercel + Render.
+- Locked: monorepo `apps/web` + `apps/api`; TypeScript strict with **no `any`** (fully type-safe); Express + Prisma MySQL (TiDB); Vite React; ImageKit; Vercel + Render.
+- Never introduce `any`, `as any`, or unjustified `@ts-ignore` / `@ts-expect-error`. Prefer Zod/`unknown` narrowing and Prisma types.
 - Do not introduce TanStack Query, Next.js, Nest, Fastify, MongoDB, or Railway unless the user asks. Use Axios for HTTP.
 - New app code goes in `apps/` (or `packages/`). Do not grow the legacy CRA / `songs-db` stack.
 - Never commit `.env` or secrets. ImageKit private key and `JWT_SECRET` stay on the API only.

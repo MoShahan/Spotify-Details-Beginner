@@ -23,7 +23,7 @@ When the user cites a checklist ID, open `plan.md` and do that item.
 | ------------- | ------------------------------------------------------------------------------------------------------- |
 | Name          | **Cadence**                                                                                             |
 | Layout        | **Monorepo** - `apps/web` + `apps/api`                                                                  |
-| Language      | **TypeScript strict** everywhere - no new plain `.js` / `.jsx` app code                                 |
+| Language      | **TypeScript strict**, **no `any`** - fully type-safe; no new plain `.js` / `.jsx` app code             |
 | Frontend      | Vite + React + Tailwind + shadcn/ui + **Axios** + RHF + Zod + Sonner + React Router (no TanStack Query) |
 | Backend       | Express + TypeScript (not Nest / Fastify)                                                               |
 | ORM / DB      | **Prisma 7** + **MySQL** / TiDB (`provider = "mysql"`; URL in `prisma.config.ts` + `.env`)              |
@@ -121,7 +121,7 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 
 ## Coding conventions
 
-1. **TypeScript strict** - typed handlers, props, Zod-inferred forms, Prisma types.
+1. **TypeScript strict, no `any`** - typed handlers, props, Zod-inferred forms, Prisma types. Use `unknown` + narrow instead of `any`. No `as any`.
 2. **Imports** - ordered/grouped (builtins → external → internal aliases → parent → sibling → styles); type-only imports where needed.
 3. **No em dashes (`-`)** - use hyphen (`-`). Enforced by `cadence/no-em-dash` + `scripts/fix-em-dash.mjs` on commit.
 4. **API** - routers + middleware; consistent JSON error shape; validate inputs with Zod.
