@@ -1,4 +1,4 @@
-import { ImagePlus, Pencil, X } from 'lucide-react';
+import { ImagePlus, Pencil } from 'lucide-react';
 import {
   type ChangeEvent,
   type FormEvent,
@@ -36,6 +36,7 @@ export function CatalogImageEditor({
 }: CatalogImageEditorProps) {
   const urlInputId = useId();
   const fileInputId = useId();
+  const titleId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [editing, setEditing] = useState(false);
@@ -54,6 +55,9 @@ export function CatalogImageEditor({
   }
 
   function closeEditor() {
+    if (busy) {
+      return;
+    }
     setEditing(false);
     setUrlDraft(currentUrl ?? '');
     if (fileInputRef.current) {
@@ -113,8 +117,8 @@ export function CatalogImageEditor({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="cadence-panel relative aspect-square overflow-hidden">
+    <>
+      <div className="cadence-panel group relative aspect-square overflow-hidden">
         {currentUrl ? (
           <img src={currentUrl} alt={alt} className="size-full object-cover" />
         ) : (
@@ -123,105 +127,127 @@ export function CatalogImageEditor({
           </div>
         )}
 
-        <div className="absolute top-2 right-2">
-          {editing ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className="gap-1.5 shadow-[var(--cadence-shadow)]"
-              disabled={busy}
-              onClick={closeEditor}
-            >
-              <X className="size-3.5" aria-hidden />
-              Cancel
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className="gap-1.5 shadow-[var(--cadence-shadow)]"
-              onClick={openEditor}
-            >
-              <Pencil className="size-3.5" aria-hidden />
+        <div className="absolute top-1.5 right-1.5">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            aria-label="Edit image"
+            className="group/edit h-7 gap-0 px-1.5 text-xs opacity-35 shadow-[var(--cadence-shadow)] transition-all duration-150 group-hover:gap-1 group-hover:px-2 group-hover:opacity-100 focus-visible:gap-1 focus-visible:px-2 focus-visible:opacity-100"
+            onClick={openEditor}
+          >
+            <Pencil className="size-3 shrink-0" aria-hidden />
+            <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-150 group-hover:max-w-12 group-hover:opacity-100 group-focus-visible/edit:max-w-12 group-focus-visible/edit:opacity-100">
               Edit
-            </Button>
-          )}
+            </span>
+          </Button>
         </div>
       </div>
 
       {editing ? (
-        <form
-          className="cadence-panel flex flex-col gap-3 p-3"
-          onSubmit={(event) => {
-            void handleSaveUrl(event);
-          }}
-        >
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={urlInputId}>{label} URL</Label>
-            <Input
-              id={urlInputId}
-              type="url"
-              value={urlDraft}
-              placeholder="https://..."
-              disabled={busy}
-              onChange={(event) => {
-                setUrlDraft(event.target.value);
-              }}
-            />
-            <p className="text-xs text-[var(--cadence-fg-muted)]">
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/40"
+            aria-label="Close dialog"
+            disabled={busy}
+            onClick={closeEditor}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            className="cadence-panel relative z-10 w-full max-w-md p-5"
+          >
+            <h2
+              id={titleId}
+              className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight"
+            >
+              {label} URL
+            </h2>
+            <p className="mt-1 text-sm text-[var(--cadence-fg-muted)]">
               Paste an image URL, or upload a file to ImageKit.
             </p>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <input
-              ref={fileInputRef}
-              id={fileInputId}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="sr-only"
-              disabled={busy}
-              onChange={(event) => {
-                void handleFileChange(event);
-              }}
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className="w-full justify-center"
-              disabled={busy}
-              onClick={() => {
-                fileInputRef.current?.click();
+            <form
+              className="mt-5 flex flex-col gap-4"
+              onSubmit={(event) => {
+                void handleSaveUrl(event);
               }}
             >
-              <ImagePlus className="size-4" aria-hidden />
-              {busy ? 'Working...' : 'Upload from computer'}
-            </Button>
-          </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor={urlInputId}>Image URL</Label>
+                <Input
+                  id={urlInputId}
+                  type="url"
+                  value={urlDraft}
+                  placeholder="https://..."
+                  disabled={busy}
+                  autoFocus
+                  onChange={(event) => {
+                    setUrlDraft(event.target.value);
+                  }}
+                />
+              </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Button type="submit" size="sm" disabled={busy}>
-              {busy ? 'Saving...' : 'Save URL'}
-            </Button>
-            {currentUrl ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={busy}
-                onClick={() => {
-                  void handleRemove();
-                }}
-              >
-                Remove
-              </Button>
-            ) : null}
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={fileInputRef}
+                  id={fileInputId}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="sr-only"
+                  disabled={busy}
+                  onChange={(event) => {
+                    void handleFileChange(event);
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-center"
+                  disabled={busy}
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  <ImagePlus className="size-4" aria-hidden />
+                  {busy ? 'Working...' : 'Upload from computer'}
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap justify-end gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy}
+                  onClick={closeEditor}
+                >
+                  Cancel
+                </Button>
+                {currentUrl ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => {
+                      void handleRemove();
+                    }}
+                  >
+                    Remove
+                  </Button>
+                ) : null}
+                <Button type="submit" size="sm" disabled={busy}>
+                  {busy ? 'Saving...' : 'Save URL'}
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       ) : null}
-    </div>
+    </>
   );
 }
