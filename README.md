@@ -11,7 +11,7 @@ apps/web   # Frontend (Vite + React + TS)
 apps/api   # Backend (Express + Prisma + TS)
 ```
 
-See [`AGENTS.md`](AGENTS.md) and [`plan.md`](plan.md) for conventions and the build checklist.
+See [`TODO.md`](TODO.md) for the step-by-step checklist, [`AGENTS.md`](AGENTS.md) for conventions, and [`plan.md`](plan.md) for stack/API reference.
 
 ## Prerequisites
 
