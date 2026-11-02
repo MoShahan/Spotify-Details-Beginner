@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { ImageUrlForm } from '../components/catalog/ImageUrlForm';
+import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
 import { Skeleton } from '../components/ui/skeleton';
 import { api, getApiErrorMessage } from '../lib/api';
 import { type CatalogSong, formatRating } from '../lib/catalog';
@@ -96,26 +96,14 @@ export function SongDetailPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
-        <div className="flex flex-col gap-4">
-          <div className="cadence-panel aspect-square overflow-hidden">
-            {song.coverUrl ? (
-              <img
-                src={song.coverUrl}
-                alt={`${song.name} cover`}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center text-sm text-[var(--cadence-fg-muted)]">
-                No cover
-              </div>
-            )}
-          </div>
-          <ImageUrlForm
-            label="Cover"
-            currentUrl={song.coverUrl}
-            onSave={saveCover}
-          />
-        </div>
+        <CatalogImageEditor
+          label="Cover"
+          alt={`${song.name} cover`}
+          emptyLabel="No cover"
+          currentUrl={song.coverUrl}
+          folder="songs"
+          onSave={saveCover}
+        />
 
         <div className="flex flex-col gap-4">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">

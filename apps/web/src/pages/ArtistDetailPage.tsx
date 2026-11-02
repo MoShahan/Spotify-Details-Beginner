@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { ImageUrlForm } from '../components/catalog/ImageUrlForm';
+import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
 import { Skeleton } from '../components/ui/skeleton';
 import { api, getApiErrorMessage } from '../lib/api';
 import {
@@ -112,26 +112,14 @@ export function ArtistDetailPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
-        <div className="flex flex-col gap-4">
-          <div className="cadence-panel aspect-square overflow-hidden">
-            {artist.imageUrl ? (
-              <img
-                src={artist.imageUrl}
-                alt={artist.name}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center text-sm text-[var(--cadence-fg-muted)]">
-                No image
-              </div>
-            )}
-          </div>
-          <ImageUrlForm
-            label="Artist image"
-            currentUrl={artist.imageUrl}
-            onSave={saveImage}
-          />
-        </div>
+        <CatalogImageEditor
+          label="Artist image"
+          alt={artist.name}
+          emptyLabel="No image"
+          currentUrl={artist.imageUrl}
+          folder="artists"
+          onSave={saveImage}
+        />
 
         <div className="flex flex-col gap-4">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
