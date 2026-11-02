@@ -1,4 +1,4 @@
-import { Disc3, Home, LogOut, Menu, Users, X } from 'lucide-react';
+import { Disc3, Home, Info, LogOut, Menu, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
@@ -48,6 +48,10 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       <NavLink to="/artists" className={navLinkClass} onClick={onNavigate}>
         <Users className="size-4 shrink-0" aria-hidden />
         Artists
+      </NavLink>
+      <NavLink to="/about" className={navLinkClass} onClick={onNavigate}>
+        <Info className="size-4 shrink-0" aria-hidden />
+        About
       </NavLink>
     </nav>
   );
@@ -138,6 +142,12 @@ export function AppShell() {
             </Link>
             <div className="flex items-center gap-1 sm:gap-2">
               <ThemeToggle />
+              <Link
+                to="/about"
+                className="inline-flex h-9 items-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)] hover:text-[var(--cadence-fg)]"
+              >
+                About
+              </Link>
               <Link
                 to="/login"
                 className="inline-flex h-9 items-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]"
