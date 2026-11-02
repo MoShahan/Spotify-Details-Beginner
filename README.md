@@ -1,10 +1,9 @@
-# Spotify App
+# Cadence
 
-A full-stack Spotify-like music catalog built as the **DeltaX Fresher Software Engineer** assignment.
+Personal full-stack music catalog — browse top songs and artists, rate tracks, and add new songs/artists. Built to showcase clean API design, SQL modeling, and a polished React UI.
 
-Browse top songs and artists, rate tracks, and add new songs/artists — backed by a Node.js API and MySQL.
-
-> All in-app functionalities are also explained on the **Home** page after login.
+> Current app: Node.js + Express + MySQL + React. A full rebuild is planned in [`plan.md`](plan.md).  
+> In-app features are also summarized on the **Home** page after login.
 
 ---
 
