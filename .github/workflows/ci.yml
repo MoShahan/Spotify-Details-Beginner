@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  frontend-lint:
+    name: Frontend lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint web
+        run: npx eslint "apps/web/**/*.{ts,tsx,js,jsx}"
+
+  frontend-test:
+    name: Frontend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test web
+        run: npm test -w cadence-web
+
+  backend-lint:
+    name: Backend lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint api
+        run: npx eslint "apps/api/**/*.{ts,tsx,js,jsx}" --ignore-pattern "apps/api/src/generated/**"
+
+  backend-test:
+    name: Backend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate -w cadence-api
+        env:
+          DATABASE_URL: mysql://user:pass@127.0.0.1:4000/cadence?sslaccept=strict
+
+      - name: Test api
+        run: npm test -w cadence-api
+        env:
+          DATABASE_URL: mysql://user:pass@127.0.0.1:4000/cadence?sslaccept=strict
