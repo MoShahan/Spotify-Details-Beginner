@@ -10,6 +10,7 @@ alwaysApply: false
 - Structure: routers + middleware + services; keep `index`/`app` thin.
 - Validate bodies/params/queries with Zod; return a consistent JSON error shape.
 - Auth: JWT + bcrypt; protect mutating catalog routes.
+- Register password (Zod): 8–24 chars, ≥1 uppercase, ≥1 lowercase, ≥1 number, ≥1 symbol. Login does not re-check complexity (only verify hash).
 - Use Prisma for DB access; no raw ad-hoc SQL unless justified.
 - ImageKit: signed upload auth on the API; never expose `IMAGEKIT_PRIVATE_KEY`.
 - Env via `process.env` / dotenv from `apps/api/.env` (`DATABASE_URL`, `JWT_SECRET`, ImageKit, `CORS_ORIGIN`, `PORT`).

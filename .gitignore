@@ -17,6 +17,9 @@ node_modules/
 apps/api/.env
 apps/web/.env
 *.pem
+local-creds.local
+**/local-creds.local
+*.creds.local
 
 # Builds & outputs
 dist/

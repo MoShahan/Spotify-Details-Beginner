@@ -47,7 +47,7 @@ cadence/
 │   ├── web/                 # Vite + React + TS → Vercel
 │   └── api/                 # Express + Prisma + TS → Render
 ├── packages/
-│   └── shared/              # Optional shared Zod / types
+│   └── shared/              # Shared Zod / types (e.g. password rules)
 ├── .github/workflows/       # ci.yml, telegram-notify.yml
 ├── .husky/                  # pre-commit → lint-staged
 ├── .cursor/rules/           # Cursor conventions
@@ -123,6 +123,7 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 ## Coding conventions
 
 1. **TypeScript strict, no `any`** - typed handlers, props, Zod-inferred forms, Prisma types. Use `unknown` + narrow instead of `any`. No `as any`.
+   1b. **Register passwords** - 8–24 chars; ≥1 upper, ≥1 lower, ≥1 number, ≥1 symbol in `@cadence/shared` (`passwordSchema`). Web validates on the form first; API validates again as a safety net. Login accepts any non-empty password then verifies the hash. Document in final README validations.
 2. **Imports** - ordered/grouped (builtins → external → internal aliases → parent → sibling → styles); type-only imports where needed.
 3. **No em dashes (`-`)** - use hyphen (`-`). Enforced by `cadence/no-em-dash` + `scripts/fix-em-dash.mjs` on commit.
 4. **API** - routers + middleware; consistent JSON error shape; validate inputs with Zod.
