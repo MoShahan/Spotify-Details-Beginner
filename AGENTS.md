@@ -6,12 +6,12 @@ Instructions for AI coding agents and humans working in this repo.
 
 **Sources of truth**
 
-| Doc | Use for |
-| --- | ------- |
-| [`plan.md`](plan.md) | Build order, checklist IDs (e.g. **14.2.3**), stack decisions |
-| [`question.md`](question.md) | Product requirements |
-| [`features-status.md`](features-status.md) | What’s Done / Partial / Pending |
-| [`AGENTS.md`](AGENTS.md) | How to work in the repo (this file) |
+| Doc                                        | Use for                                                       |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| [`plan.md`](plan.md)                       | Build order, checklist IDs (e.g. **14.2.3**), stack decisions |
+| [`question.md`](question.md)               | Product requirements                                          |
+| [`features-status.md`](features-status.md) | What’s Done / Partial / Pending                               |
+| [`AGENTS.md`](AGENTS.md)                   | How to work in the repo (this file)                           |
 
 When the user cites a checklist ID, open `plan.md` and do that item.
 
@@ -19,20 +19,20 @@ When the user cites a checklist ID, open `plan.md` and do that item.
 
 ## Locked decisions (do not reopen unless asked)
 
-| Topic | Choice |
-| ----- | ------ |
-| Name | **Cadence** |
-| Layout | **Monorepo** - `apps/web` + `apps/api` |
-| Language | **TypeScript strict** everywhere - no new plain `.js` / `.jsx` app code |
-| Frontend | Vite + React + Tailwind + shadcn/ui + **Axios** + RHF + Zod + Sonner + React Router (no TanStack Query) |
-| Backend | Express + TypeScript (not Nest / Fastify) |
-| ORM / DB | **Prisma** + **MySQL** via **TiDB Cloud Starter** (`provider = "mysql"`) |
-| Auth | JWT + bcrypt (name + email) |
-| Images | ImageKit (signed upload from API; private key never on web) |
-| Hosting | Web → **Vercel**; API → **Render** |
-| Lint / format | ESLint (incl. import order) + Prettier project-wide |
-| Git hooks | Husky pre-commit → lint-staged (fix staged files) |
-| Not in scope | TanStack Query, MongoDB, Next.js, Railway, GraphQL (unless Phase 4), Spotify player |
+| Topic         | Choice                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| Name          | **Cadence**                                                                                             |
+| Layout        | **Monorepo** - `apps/web` + `apps/api`                                                                  |
+| Language      | **TypeScript strict** everywhere - no new plain `.js` / `.jsx` app code                                 |
+| Frontend      | Vite + React + Tailwind + shadcn/ui + **Axios** + RHF + Zod + Sonner + React Router (no TanStack Query) |
+| Backend       | Express + TypeScript (not Nest / Fastify)                                                               |
+| ORM / DB      | **Prisma 7** + **MySQL** / TiDB (`provider = "mysql"`; URL in `prisma.config.ts` + `.env`)              |
+| Auth          | JWT + bcrypt (name + email)                                                                             |
+| Images        | ImageKit (signed upload from API; private key never on web)                                             |
+| Hosting       | Web → **Vercel**; API → **Render**                                                                      |
+| Lint / format | ESLint (incl. import order) + Prettier project-wide                                                     |
+| Git hooks     | Husky pre-commit → lint-staged (fix staged files)                                                       |
+| Not in scope  | TanStack Query, MongoDB, Next.js, Railway, GraphQL (unless Phase 4), Spotify player                     |
 
 ImageKit / Render / Vercel cloud projects are **deferred until deploy-ready**. TiDB + local `DATABASE_URL` come first.
 
@@ -61,7 +61,7 @@ cadence/
 └── README.md
 ```
 
-**Current state:** legacy CRA + Express JS still in repo root / `songs-db/`. Phase 0 replaces this with the monorepo above. Prefer writing new code under `apps/` once scaffolded; don’t extend the legacy stack unless fixing a blocker.
+**Current state:** Monorepo scaffold in place (`apps/web`, `apps/api`). Legacy CRA / `songs-db` removed. Implement features in `apps/` only.
 
 ---
 
@@ -69,29 +69,29 @@ cadence/
 
 ### API (`apps/api/.env`) - Render in production
 
-| Variable | Purpose |
-| -------- | ------- |
-| `DATABASE_URL` | TiDB Cloud MySQL URL (`?sslaccept=strict`) |
-| `JWT_SECRET` | Sign/verify JWTs |
-| `IMAGEKIT_PUBLIC_KEY` | ImageKit |
-| `IMAGEKIT_PRIVATE_KEY` | ImageKit - **API only** |
-| `IMAGEKIT_URL_ENDPOINT` | ImageKit CDN base |
-| `CORS_ORIGIN` | Allowed web origin (Vercel URL) |
-| `NODE_ENV` | `development` / `production` |
-| `PORT` | API port (Render sets this) |
+| Variable                | Purpose                                    |
+| ----------------------- | ------------------------------------------ |
+| `DATABASE_URL`          | TiDB Cloud MySQL URL (`?sslaccept=strict`) |
+| `JWT_SECRET`            | Sign/verify JWTs                           |
+| `IMAGEKIT_PUBLIC_KEY`   | ImageKit                                   |
+| `IMAGEKIT_PRIVATE_KEY`  | ImageKit - **API only**                    |
+| `IMAGEKIT_URL_ENDPOINT` | ImageKit CDN base                          |
+| `CORS_ORIGIN`           | Allowed web origin (Vercel URL)            |
+| `NODE_ENV`              | `development` / `production`               |
+| `PORT`                  | API port (Render sets this)                |
 
 ### Web (`apps/web/.env`) - Vercel in production
 
-| Variable | Purpose |
-| -------- | ------- |
+| Variable       | Purpose             |
+| -------------- | ------------------- |
 | `VITE_API_URL` | Public API base URL |
 
 ### GitHub Actions (secrets - later)
 
-| Secret | Purpose |
-| ------ | ------- |
+| Secret               | Purpose       |
+| -------------------- | ------------- |
 | `TELEGRAM_BOT_TOKEN` | Deploy notify |
-| `TELEGRAM_CHAT_ID` | Deploy notify |
+| `TELEGRAM_CHAT_ID`   | Deploy notify |
 
 **Rules**
 
@@ -105,15 +105,15 @@ cadence/
 
 Typical root scripts (adjust names if scaffold differs):
 
-| Script | Meaning |
-| ------ | ------- |
-| `npm run dev` / workspace filters | Run web and/or api |
-| `npm run lint` | ESLint |
-| `npm run lint:fix` | ESLint with `--fix` |
-| `npm run format` / `format:check` | Prettier |
-| `npm run typecheck` | `tsc --noEmit` (web + api) |
-| `npm test` | Vitest (and API tests) |
-| `prepare` | Husky install |
+| Script                            | Meaning                    |
+| --------------------------------- | -------------------------- |
+| `npm run dev` / workspace filters | Run web and/or api         |
+| `npm run lint`                    | ESLint                     |
+| `npm run lint:fix`                | ESLint with `--fix`        |
+| `npm run format` / `format:check` | Prettier                   |
+| `npm run typecheck`               | `tsc --noEmit` (web + api) |
+| `npm test`                        | Vitest (and API tests)     |
+| `prepare`                         | Husky install              |
 
 API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as documented in README after scaffold.
 
@@ -125,7 +125,7 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 2. **Imports** - ordered/grouped (builtins → external → internal aliases → parent → sibling → styles); type-only imports where needed.
 3. **No em dashes (`-`)** - use hyphen (`-`). Enforced by `cadence/no-em-dash` + `scripts/fix-em-dash.mjs` on commit.
 4. **API** - routers + middleware; consistent JSON error shape; validate inputs with Zod.
-5. **Web** - light/dark on every page; **skeleton loaders** while fetching (never circular spinners); empty / error states; toasts via Sonner.
+5. **Web** - light/dark on every page; **mobile responsive** (phone → desktop); **skeleton loaders** while fetching (never circular spinners); empty / error states; toasts via Sonner.
 6. **DB** - normalized schema (`users`, `artists`, `songs`, `song_artists`, `ratings`); no denormalized CSV artists or rating-on-song-row.
 7. **Don’t** bypass pre-commit with `--no-verify` in normal workflow.
 8. **Don’t** expand scope into plan §15 (out of scope) unless the user asks.
@@ -170,14 +170,14 @@ Browser → Vercel (apps/web)
 
 ## Phase pointer
 
-See `plan.md` §12 / §16. Pre-start: TiDB + monorepo + stack + `AGENTS.md` + Cursor rules locked. Next: Phase 0 scaffold.
+See `plan.md` §12 / §16. Phase 0 scaffold is in place. Next: **Phase 1** (API schema, auth, catalog, ratings).
 
 ## Cursor rules
 
-| File | When |
-| ---- | ---- |
-| `.cursor/rules/cadence-core.mdc` | Always |
-| `.cursor/rules/express-api.mdc` | `apps/api/**` |
-| `.cursor/rules/react-web.mdc` | `apps/web/**` |
-| `.cursor/rules/prisma-db.mdc` | Prisma schema / migrations |
-| `.cursor/rules/testing.mdc` | Tests |
+| File                             | When                       |
+| -------------------------------- | -------------------------- |
+| `.cursor/rules/cadence-core.mdc` | Always                     |
+| `.cursor/rules/express-api.mdc`  | `apps/api/**`              |
+| `.cursor/rules/react-web.mdc`    | `apps/web/**`              |
+| `.cursor/rules/prisma-db.mdc`    | Prisma schema / migrations |
+| `.cursor/rules/testing.mdc`      | Tests                      |

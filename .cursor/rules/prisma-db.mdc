@@ -6,7 +6,8 @@ alwaysApply: false
 
 # Prisma / MySQL (TiDB)
 
-- `provider = "mysql"`. Connection from `DATABASE_URL` (TiDB; keep `sslaccept=strict`).
+- Prisma **7**: `provider = "mysql"` in `schema.prisma` (no `url` there). Set `DATABASE_URL` in `apps/api/prisma.config.ts` + `.env` (TiDB; keep `sslaccept=strict`).
+- Client uses `@prisma/adapter-mariadb`; generated client lives under `apps/api/src/generated/prisma`.
 - Normalized models only: `User`, `Artist`, `Song`, `SongArtist`, `Rating`.
 - Ratings: per-user 1–5 with `@@unique([userId, songId])`. No rating column on `Song`.
 - Song↔Artist is M2M via join table - not CSV strings.
