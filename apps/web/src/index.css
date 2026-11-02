@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light dark;
+  --cadence-ink: #0f1419;
+  --cadence-lime: #c8f135;
+  --cadence-mist: #e8efe6;
+  font-family: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  background: var(--cadence-mist);
+  color: var(--cadence-ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
