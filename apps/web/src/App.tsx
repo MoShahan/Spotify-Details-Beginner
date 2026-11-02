@@ -6,10 +6,13 @@ import { SessionGate } from './components/auth/SessionGate';
 import { AppShell } from './components/layout/AppShell';
 import { AuthProvider } from './contexts/auth';
 import { ThemeProvider } from './contexts/theme';
+import { AboutPage } from './pages/AboutPage';
 import { ArtistDetailPage } from './pages/ArtistDetailPage';
 import { ArtistsPage } from './pages/ArtistsPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
+import { NewArtistPage } from './pages/NewArtistPage';
+import { NewSongPage } from './pages/NewSongPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { SongDetailPage } from './pages/SongDetailPage';
 import { SongsPage } from './pages/SongsPage';
@@ -38,6 +41,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/songs/new"
+                element={
+                  <ProtectedRoute>
+                    <NewSongPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/songs/:id"
                 element={
                   <ProtectedRoute>
@@ -54,6 +65,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/artists/new"
+                element={
+                  <ProtectedRoute>
+                    <NewArtistPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/artists/:id"
                 element={
                   <ProtectedRoute>
@@ -61,6 +80,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
