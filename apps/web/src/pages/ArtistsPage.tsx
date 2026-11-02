@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CatalogSearch } from '../components/catalog/CatalogSearch';
+import { CatalogThumb } from '../components/catalog/CatalogThumb';
 import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
 import { api, getApiErrorMessage } from '../lib/api';
@@ -87,6 +88,12 @@ export function ArtistsPage() {
         <table className="w-full min-w-[32rem] border-collapse text-sm">
           <thead className="bg-[var(--cadence-muted)]/45">
             <tr>
+              <th
+                scope="col"
+                className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+              >
+                <span className="sr-only">Image</span>
+              </th>
               <SortableTh
                 label="Name"
                 column="name"
@@ -119,13 +126,13 @@ export function ArtistsPage() {
           </thead>
           <tbody>
             {state.status === 'loading' ? (
-              <TableBodySkeleton columns={4} />
+              <TableBodySkeleton columns={5} />
             ) : null}
 
             {state.status === 'error' ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-3 py-6 text-sm text-[var(--cadence-fg-muted)]"
                   role="alert"
                 >
@@ -137,7 +144,7 @@ export function ArtistsPage() {
             {state.status === 'ready' && state.artists.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-3 py-6 text-sm text-[var(--cadence-fg-muted)]"
                 >
                   No artists match your search.
@@ -151,6 +158,11 @@ export function ArtistsPage() {
                     key={artist.id}
                     className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
                   >
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-2">
+                      <Link to={`/artists/${artist.id}`} tabIndex={-1}>
+                        <CatalogThumb src={artist.imageUrl} alt={artist.name} />
+                      </Link>
+                    </td>
                     <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">
                       <Link
                         to={`/artists/${artist.id}`}

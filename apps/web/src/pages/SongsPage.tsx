@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CatalogSearch } from '../components/catalog/CatalogSearch';
+import { CatalogThumb } from '../components/catalog/CatalogThumb';
 import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
 import { api, getApiErrorMessage } from '../lib/api';
@@ -87,6 +88,12 @@ export function SongsPage() {
         <table className="w-full min-w-[40rem] border-collapse text-sm">
           <thead className="bg-[var(--cadence-muted)]/45">
             <tr>
+              <th
+                scope="col"
+                className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+              >
+                <span className="sr-only">Cover</span>
+              </th>
               <SortableTh
                 label="Name"
                 column="name"
@@ -126,13 +133,13 @@ export function SongsPage() {
           </thead>
           <tbody>
             {state.status === 'loading' ? (
-              <TableBodySkeleton columns={5} />
+              <TableBodySkeleton columns={6} />
             ) : null}
 
             {state.status === 'error' ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="px-3 py-6 text-sm text-[var(--cadence-fg-muted)]"
                   role="alert"
                 >
@@ -144,7 +151,7 @@ export function SongsPage() {
             {state.status === 'ready' && state.songs.length === 0 ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="px-3 py-6 text-sm text-[var(--cadence-fg-muted)]"
                 >
                   No songs match your search.
@@ -158,6 +165,14 @@ export function SongsPage() {
                     key={song.id}
                     className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
                   >
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-2">
+                      <Link to={`/songs/${song.id}`} tabIndex={-1}>
+                        <CatalogThumb
+                          src={song.coverUrl}
+                          alt={`${song.name} cover`}
+                        />
+                      </Link>
+                    </td>
                     <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">
                       <Link
                         to={`/songs/${song.id}`}
