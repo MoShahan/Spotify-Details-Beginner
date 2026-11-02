@@ -18,10 +18,12 @@ import {
   findSongByNameAndArtistSet,
 } from '../services/catalog-uniqueness.js';
 import {
+  createSong,
   getSongById,
   listSongs,
   listTopSongs,
   updateSongCoverUrl,
+  upsertSongRating,
 } from '../services/songs.js';
 
 export const songsRouter = Router();
@@ -58,18 +60,28 @@ songsRouter.get(
 );
 
 /**
- * Create song + artist links.
- * Requires at least one artist. Same title is allowed only when the artist set differs
- * (sorted id compare). Duplicate title + same artists → 409.
- * Full auth + insert lands in TODO 1.4.x; conflict / artist checks are enforced now.
+ * Create song + artist links (auth).
+ * Requires at least one artist. Same title OK when the artist set differs.
+ * Duplicate title + same artists → 409.
  */
 songsRouter.post(
   '/',
+  requireAuth,
   validateRequest(createSongBodySchema, 'body'),
   async (req, res, next) => {
     try {
       const body = createSongBodySchema.parse(req.body);
       const artistIds = normalizeArtistIds(body.artistIds);
+      const userId = req.auth?.userId;
+      if (!userId) {
+        res.status(401).json({
+          error: {
+            code: 'AUTH_REQUIRED',
+            message: 'Authentication required to create a song',
+          },
+        });
+        return;
+      }
 
       const missing = await findMissingArtistIds(artistIds);
       if (missing.length > 0) {
@@ -95,12 +107,12 @@ songsRouter.post(
         return;
       }
 
-      res.status(401).json({
-        error: {
-          code: 'AUTH_REQUIRED',
-          message: 'Authentication required to create a song',
-        },
+      const song = await createSong({
+        ...body,
+        artistIds,
+        createdByUserId: userId,
       });
+      res.status(201).json({ song });
     } catch (error: unknown) {
       next(error);
     }
@@ -158,20 +170,39 @@ songsRouter.patch(
 );
 
 /**
- * Upsert rating for a song.
- * Body `{ value }` must be 1–5 (decimals allowed). Out-of-range → 400.
- * Full auth + DB upsert lands in TODO 1.5.x; validation is enforced now.
+ * Upsert rating for a song (auth). Value 1–5, decimals OK.
  */
 songsRouter.post(
   '/:id/ratings',
+  requireAuth,
   validateRequest(songIdParamsSchema, 'params'),
   validateRequest(upsertRatingBodySchema, 'body'),
-  (_req, res) => {
-    res.status(401).json({
-      error: {
-        code: 'AUTH_REQUIRED',
-        message: 'Authentication required to rate a song',
-      },
-    });
+  async (req, res, next) => {
+    try {
+      const { id: songId } = songIdParamsSchema.parse(req.params);
+      const body = upsertRatingBodySchema.parse(req.body);
+      const userId = req.auth?.userId;
+      if (!userId) {
+        res.status(401).json({
+          error: {
+            code: 'AUTH_REQUIRED',
+            message: 'Authentication required to rate a song',
+          },
+        });
+        return;
+      }
+
+      const rating = await upsertSongRating(userId, songId, body.value);
+      if (!rating) {
+        res.status(404).json({
+          error: { code: 'NOT_FOUND', message: 'Song not found' },
+        });
+        return;
+      }
+
+      res.status(200).json({ rating });
+    } catch (error: unknown) {
+      next(error);
+    }
   },
 );

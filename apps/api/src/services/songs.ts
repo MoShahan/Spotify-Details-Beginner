@@ -1,3 +1,4 @@
+import { normalizeArtistIds } from '../lib/artist-ids.js';
 import { prisma } from '../lib/prisma.js';
 import {
   averageFromValues,
@@ -6,6 +7,7 @@ import {
   compareNullableString,
 } from '../lib/ratings.js';
 import type { ListSongsQuery } from '../schemas/list-query.js';
+import type { CreateSongBody } from '../schemas/song.js';
 
 export type SongListItem = {
   id: string;
@@ -150,6 +152,28 @@ export async function getSongById(id: string): Promise<SongDetail | null> {
   return mapSong(song);
 }
 
+export async function createSong(
+  input: CreateSongBody & { createdByUserId: string },
+): Promise<SongListItem> {
+  const artistIds = normalizeArtistIds(input.artistIds);
+
+  const song = await prisma.song.create({
+    data: {
+      name: input.name,
+      releaseDate: new Date(`${input.releaseDate}T00:00:00.000Z`),
+      album: input.album ?? null,
+      coverUrl: input.coverUrl ?? null,
+      createdByUserId: input.createdByUserId,
+      artists: {
+        create: artistIds.map((artistId) => ({ artistId })),
+      },
+    },
+    include: songListInclude,
+  });
+
+  return mapSong(song);
+}
+
 export async function updateSongCoverUrl(
   id: string,
   coverUrl: string | null,
@@ -165,4 +189,46 @@ export async function updateSongCoverUrl(
   });
 
   return getSongById(id);
+}
+
+export type SongRatingItem = {
+  id: string;
+  userId: string;
+  songId: string;
+  value: number;
+};
+
+export async function upsertSongRating(
+  userId: string,
+  songId: string,
+  value: number,
+): Promise<SongRatingItem | null> {
+  const song = await prisma.song.findUnique({
+    where: { id: songId },
+    select: { id: true },
+  });
+  if (!song) {
+    return null;
+  }
+
+  const rating = await prisma.rating.upsert({
+    where: {
+      userId_songId: { userId, songId },
+    },
+    create: {
+      userId,
+      songId,
+      value,
+    },
+    update: {
+      value,
+    },
+  });
+
+  return {
+    id: rating.id,
+    userId: rating.userId,
+    songId: rating.songId,
+    value: Number(rating.value.toString()),
+  };
 }
