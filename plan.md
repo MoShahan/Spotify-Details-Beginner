@@ -4,18 +4,18 @@
 
 This plan rebuilds the current codebase into a complete, professional product using [`question.md`](question.md) as the **product requirements** source and [`features-status.md`](features-status.md) as the gap list - framed as a portfolio app, not coursework.
 
-**Status:** Planning. Name locked: **Cadence**. DB locked: **MySQL + TiDB Cloud Starter**. Ready for Phase 0.
+**Status:** Phase 0 scaffold complete (`apps/web` + `apps/api`). Name: **Cadence**. DB: **MySQL + TiDB Cloud Starter**. Next: Phase 1 API.
 
 ---
 
 ## 1. Brand
 
-| Item | Value |
-| ---- | ----- |
-| **Name** | Cadence |
-| **Tagline (draft)** | Rate the rhythm. Rank the artists. |
-| **Repos / packages** | `cadence`, `cadence-web`, `cadence-api` |
-| **Hosts** | Vercel project `cadence`, Render service `cadence-api` |
+| Item                 | Value                                                  |
+| -------------------- | ------------------------------------------------------ |
+| **Name**             | Cadence                                                |
+| **Tagline (draft)**  | Rate the rhythm. Rank the artists.                     |
+| **Repos / packages** | `cadence`, `cadence-web`, `cadence-api`                |
+| **Hosts**            | Vercel project `cadence`, Render service `cadence-api` |
 
 Rename package titles, HTML `<title>`, logos, and README to **Cadence** during Phase 0.
 
@@ -27,63 +27,66 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 
 **Hard requirement:** Cadence is a **TypeScript** project end-to-end. No new app code in plain `.js` / `.jsx`.
 
-| Layer | Choice | Why |
-| ----- | ------ | --- |
-| Language | **TypeScript (strict)** | Frontend + backend + shared types; `tsc --noEmit` in CI |
-| Frontend | **React + TypeScript + Vite** | `.tsx` components; typed hooks, props, API clients |
-| Why not Next | - | Keeps Express as the real backend on Render |
-| UI | **Tailwind CSS + shadcn/ui** | Polished dark / light themes |
-| Theme | Class-based light/dark toggle | Every page |
-| Data fetching | **Axios only** (no TanStack Query) | Typed API client helpers; loading/error in component state or small hooks |
-| Loading UI | **Skeleton loaders** | While fetching data - **no** circular spinners |
-| Forms | **React Hook Form + Zod** | Infer form types from Zod (`z.infer<>`) |
-| Toasts | **Sonner** | Success / error feedback |
-| Routing | **React Router** | Auth + home + add song |
-| Backend | **Express + TypeScript** | Typed req/res via middleware; no Nest/Fastify/etc. |
-| Shared types | **`packages/shared` (optional)** or Zod schemas imported by API + web | One source of truth for DTOs |
-| ORM | **Prisma** | Generated TS client + migrations; MySQL or Postgres |
-| Database | **MySQL via TiDB Cloud Starter** (see §2.1) | Normalized schema, join tables, FKs - not Mongo |
-| Auth | **JWT + bcrypt** | User name + email |
-| Images | **ImageKit** | Covers / CDN (no DIY S3) |
-| Frontend host | **Vercel** | |
-| Backend host | **Render** (Web Service) | |
-| Lint | **ESLint** (flat config) + **import order / grouping** | Enforce import groups project-wide |
-| Format | **Prettier** | Single style for the entire monorepo |
-| Git hooks | **Husky** + **lint-staged** | Pre-commit: lint + auto-fix staged files |
-| CI | **GitHub Actions** | Lint + typecheck + tests |
-| Notify | **Telegram** via GitHub Action | On Vercel production deploy |
+**Hard requirement - type safety:** **No `any`.** Everything must be type-safe. Prefer concrete types, `unknown` + narrowing, Zod inference (`z.infer<>`), and Prisma-generated types. Ban `as any`, and avoid `@ts-ignore` / `@ts-expect-error` unless there is a short justified comment and no better fix.
+
+| Layer         | Choice                                                                | Why                                                                       |
+| ------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Language      | **TypeScript (strict), no `any`**                                     | Fully type-safe web + API; `tsc --noEmit` + ESLint `no-explicit-any`      |
+| Frontend      | **React + TypeScript + Vite**                                         | `.tsx` components; typed hooks, props, API clients                        |
+| Responsive    | **Mobile responsive** (required)                                      | Phone + tablet + desktop; no desktop-only layouts                         |
+| Why not Next  | -                                                                     | Keeps Express as the real backend on Render                               |
+| UI            | **Tailwind CSS + shadcn/ui**                                          | Polished dark / light themes                                              |
+| Theme         | Class-based light/dark toggle                                         | Every page                                                                |
+| Data fetching | **Axios only** (no TanStack Query)                                    | Typed API client helpers; loading/error in component state or small hooks |
+| Loading UI    | **Skeleton loaders**                                                  | While fetching data - **no** circular spinners                            |
+| Forms         | **React Hook Form + Zod**                                             | Infer form types from Zod (`z.infer<>`)                                   |
+| Toasts        | **Sonner**                                                            | Success / error feedback                                                  |
+| Routing       | **React Router**                                                      | Auth + home + add song                                                    |
+| Backend       | **Express + TypeScript**                                              | Typed req/res via middleware; no Nest/Fastify/etc.                        |
+| Shared types  | **`packages/shared` (optional)** or Zod schemas imported by API + web | One source of truth for DTOs                                              |
+| ORM           | **Prisma**                                                            | Generated TS client + migrations; MySQL or Postgres                       |
+| Database      | **MySQL via TiDB Cloud Starter** (see §2.1)                           | Normalized schema, join tables, FKs - not Mongo                           |
+| Auth          | **JWT + bcrypt**                                                      | User name + email                                                         |
+| Images        | **ImageKit**                                                          | Covers / CDN (no DIY S3)                                                  |
+| Frontend host | **Vercel**                                                            |                                                                           |
+| Backend host  | **Render** (Web Service)                                              |                                                                           |
+| Lint          | **ESLint** (flat config) + **import order / grouping**                | Enforce import groups project-wide                                        |
+| Format        | **Prettier**                                                          | Single style for the entire monorepo                                      |
+| Git hooks     | **Husky** + **lint-staged**                                           | Pre-commit: lint + auto-fix staged files                                  |
+| CI            | **GitHub Actions**                                                    | Lint + typecheck + tests                                                  |
+| Notify        | **Telegram** via GitHub Action                                        | On Vercel production deploy                                               |
 
 ### 2.1 Database: MySQL vs Postgres vs Mongo - and how to host MySQL
 
-| Option | Fit for Cadence? | “Atlas-like” free host? | Verdict |
-| ------ | ---------------- | ----------------------- | ------- |
-| **MySQL** | Excellent for relational design | Weaker than Atlas/Neon - see below | Good if you want MySQL on the resume |
-| **PostgreSQL** | Excellent (same model) | **Neon** - closest to Atlas DX | Best *deploy* experience |
-| **MongoDB** | Weak for M2M + FKs + averages | Atlas | **Skip** for Cadence |
+| Option         | Fit for Cadence?                | “Atlas-like” free host?            | Verdict                              |
+| -------------- | ------------------------------- | ---------------------------------- | ------------------------------------ |
+| **MySQL**      | Excellent for relational design | Weaker than Atlas/Neon - see below | Good if you want MySQL on the resume |
+| **PostgreSQL** | Excellent (same model)          | **Neon** - closest to Atlas DX     | Best _deploy_ experience             |
+| **MongoDB**    | Weak for M2M + FKs + averages   | Atlas                              | **Skip** for Cadence                 |
 
 **Mongo Atlas** = managed DB, no server for you.  
 **Neon** = same idea for **Postgres**.  
-**MySQL** has **no single dominant free serverless twin** as polished as Atlas/Neon. You still need a managed MySQL provider (or a MySQL-*compatible* serverless).
+**MySQL** has **no single dominant free serverless twin** as polished as Atlas/Neon. You still need a managed MySQL provider (or a MySQL-_compatible_ serverless).
 
 #### MySQL hosting options (no Railway)
 
-| Provider | Notes |
-| -------- | ----- |
-| **TiDB Cloud Serverless** | MySQL-compatible protocol; has a free/serverless tier; strong “connect string and go” story |
-| **Aiven for MySQL** | Managed MySQL; free trial / credits then paid - solid for demos |
-| **Oracle Cloud Always Free** | Can run MySQL; more setup than Neon |
-| **DigitalOcean / AWS RDS / Azure MySQL** | Paid managed MySQL - fine if you budget for it |
-| **db4free / hobby free MySQL sites** | OK for toys; unreliable for a portfolio URL - avoid |
-| **Local MySQL only** | Great for dev; production API on Render still needs a reachable cloud DB |
+| Provider                                 | Notes                                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **TiDB Cloud Serverless**                | MySQL-compatible protocol; has a free/serverless tier; strong “connect string and go” story |
+| **Aiven for MySQL**                      | Managed MySQL; free trial / credits then paid - solid for demos                             |
+| **Oracle Cloud Always Free**             | Can run MySQL; more setup than Neon                                                         |
+| **DigitalOcean / AWS RDS / Azure MySQL** | Paid managed MySQL - fine if you budget for it                                              |
+| **db4free / hobby free MySQL sites**     | OK for toys; unreliable for a portfolio URL - avoid                                         |
+| **Local MySQL only**                     | Great for dev; production API on Render still needs a reachable cloud DB                    |
 
 You said you **don’t use Railway** - plan does **not** depend on it.
 
 #### Decision: **MySQL + TiDB Cloud Starter** (locked)
 
-- **Prod / shared cloud DB:** [TiDB Cloud Starter](https://tidbcloud.com) (formerly Serverless) - MySQL-compatible, **free monthly quota** (not a time-limited trial; no paid trial path required).  
-- **Prisma:** `provider = "mysql"` + `DATABASE_URL` from the TiDB console (use the SSL params they show).  
-- **Dev:** local MySQL **or** the same TiDB cluster URL.  
-- **Render API:** set `DATABASE_URL` to the TiDB connection string.  
+- **Prod / shared cloud DB:** [TiDB Cloud Starter](https://tidbcloud.com) (formerly Serverless) - MySQL-compatible, **free monthly quota** (not a time-limited trial; no paid trial path required).
+- **Prisma 7:** `provider = "mysql"` in `schema.prisma`; `DATABASE_URL` in `apps/api/.env` + `prisma.config.ts` (TiDB SSL params as shown in console).
+- **Dev:** local MySQL **or** the same TiDB cluster URL.
+- **Render API:** set `DATABASE_URL` to the TiDB connection string.
 
 **Skipped:** Neon Postgres (Postgres-only; not needed now). Aiven / RDS trials. Hobby free MySQL hosts.
 
@@ -125,31 +128,31 @@ Use ESLint (flat config) with an import plugin (e.g. `eslint-plugin-import` and/
 
 **Required import groups** (blank line between groups), applied to **all** `apps/` and `packages/`:
 
-1. Node / built-ins (`node:`, `fs`, `path`, …)  
-2. External packages (`react`, `express`, `axios`, …)  
-3. Internal / shared aliases (`@cadence/shared`, `@/…`)  
-4. Relative parent imports (`../…`)  
-5. Relative sibling / same-folder imports (`./…`)  
-6. Side-effect / style imports (`*.css`, etc.) last  
+1. Node / built-ins (`node:`, `fs`, `path`, …)
+2. External packages (`react`, `express`, `axios`, …)
+3. Internal / shared aliases (`@cadence/shared`, `@/…`)
+4. Relative parent imports (`../…`)
+5. Relative sibling / same-folder imports (`./…`)
+6. Side-effect / style imports (`*.css`, etc.) last
 
-Also enforce: no unused imports, consistent type-only imports (`import type { … }`), and TypeScript-aware linting for `.ts` / `.tsx`.
+Also enforce: **`@typescript-eslint/no-explicit-any`: error**, no unused imports, consistent type-only imports (`import type { … }`), and TypeScript-aware linting for `.ts` / `.tsx`.
 
 #### Prettier - entire project
 
-- One root **Prettier** config (`.prettierrc`) + `.prettierignore` (e.g. `dist`, `coverage`, Prisma generate output, lockfiles).  
-- Same print width, quotes, semicolons, trailing commas for **web + api + shared**.  
-- Wire `eslint-config-prettier` so ESLint never fights Prettier.  
+- One root **Prettier** config (`.prettierrc`) + `.prettierignore` (e.g. `dist`, `coverage`, Prisma generate output, lockfiles).
+- Same print width, quotes, semicolons, trailing commas for **web + api + shared**.
+- Wire `eslint-config-prettier` so ESLint never fights Prettier.
 - Scripts: `format` / `format:check` at the repo root; CI runs `format:check`.
 
 #### Husky + lint-staged (pre-commit)
 
 Whenever something is committed:
 
-1. **Husky** `pre-commit` hook runs **lint-staged**.  
-2. **lint-staged** runs only on **staged** files:  
-   - ESLint with `--fix` (auto-fix lint issues where safe)  
-   - Prettier `--write` (reformat)  
-3. Fixed files are re-staged so the commit includes the cleaned result.  
+1. **Husky** `pre-commit` hook runs **lint-staged**.
+2. **lint-staged** runs only on **staged** files:
+   - ESLint with `--fix` (auto-fix lint issues where safe)
+   - Prettier `--write` (reformat)
+3. Fixed files are re-staged so the commit includes the cleaned result.
 4. If remaining errors are not auto-fixable, the commit **fails** until the developer fixes them.
 
 Root `package.json` sketch:
@@ -176,70 +179,70 @@ Install/setup in Phase 0: `husky`, `lint-staged`, `eslint`, Prettier, import-ord
 
 ## 3. Deployment & secrets
 
-| Service | Role | Env |
-| ------- | ---- | --- |
-| **TiDB Cloud Starter** | MySQL-compatible database | `DATABASE_URL` |
-| **Render** | Express API | `DATABASE_URL`, `JWT_SECRET`, `IMAGEKIT_*`, `CORS_ORIGIN`, `NODE_ENV`, `PORT` |
-| **Vercel** | Frontend | `VITE_API_URL` |
-| **ImageKit** | Covers | Public key + URL endpoint (FE); **private key only on API** |
-| **GitHub Secrets** | CI + Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, CI `DATABASE_URL` if needed |
+| Service                | Role                      | Env                                                                           |
+| ---------------------- | ------------------------- | ----------------------------------------------------------------------------- |
+| **TiDB Cloud Starter** | MySQL-compatible database | `DATABASE_URL`                                                                |
+| **Render**             | Express API               | `DATABASE_URL`, `JWT_SECRET`, `IMAGEKIT_*`, `CORS_ORIGIN`, `NODE_ENV`, `PORT` |
+| **Vercel**             | Frontend                  | `VITE_API_URL`                                                                |
+| **ImageKit**           | Covers                    | Public key + URL endpoint (FE); **private key only on API**                   |
+| **GitHub Secrets**     | CI + Telegram             | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, CI `DATABASE_URL` if needed         |
 
 ### ImageKit
 
-1. User picks cover on Add Song.  
-2. Signed upload via ImageKit (auth from Express).  
-3. Store `cover_url` / file id on `songs`.  
+1. User picks cover on Add Song.
+2. Signed upload via ImageKit (auth from Express).
+3. Store `cover_url` / file id on `songs`.
 4. Listings use ImageKit thumbnails.
 
 ### Telegram notify
 
 Workflow `.github/workflows/telegram-notify.yml`:
 
-- On Vercel production `deployment_status` = success  
-- Message: `✅ Cadence deployed - <url>` (+ commit SHA)  
-- Secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (bot already ready)  
+- On Vercel production `deployment_status` = success
+- Message: `✅ Cadence deployed - <url>` (+ commit SHA)
+- Secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (bot already ready)
 - Test once with `workflow_dispatch`
 
 ---
 
 ## 4. MCP / Cursor setup (before coding)
 
-| Tool | Purpose |
-| ---- | ------- |
-| GitHub / `gh` | PRs, Actions |
-| TiDB Cloud console | Schema & SQL |
-| Vercel MCP / CLI | Frontend deploy |
-| Render dashboard | API service + env |
-| ImageKit dashboard | Keys, folders |
-| Browser MCP | Visual QA (themes) |
+| Tool               | Purpose            |
+| ------------------ | ------------------ |
+| GitHub / `gh`      | PRs, Actions       |
+| TiDB Cloud console | Schema & SQL       |
+| Vercel MCP / CLI   | Frontend deploy    |
+| Render dashboard   | API service + env  |
+| ImageKit dashboard | Keys, folders      |
+| Browser MCP        | Visual QA (themes) |
 
 **AI guidance files - yes:**
 
-| File | Purpose |
-| ---- | ------- |
-| `AGENTS.md` | Repo map, scripts, env names, never commit secrets |
-| `.cursor/rules/*.mdc` | Express, React/UI, Prisma, testing conventions |
-| Optional skill | Only if you want a reusable “Cadence feature” skill |
+| File                  | Purpose                                             |
+| --------------------- | --------------------------------------------------- |
+| `AGENTS.md`           | Repo map, scripts, env names, never commit secrets  |
+| `.cursor/rules/*.mdc` | Express, React/UI, Prisma, testing conventions      |
+| Optional skill        | Only if you want a reusable “Cadence feature” skill |
 
 **4.1 Pre-start checklist**
 
-- [x] **4.1.1** `AGENTS.md` + Cursor rules (`.cursor/rules/`)  
-- [ ] **4.1.2** Auth MCPs / CLIs as needed  
-- [~] **4.1.3** Cloud projects: **TiDB Cloud Starter** done (+ `apps/api/.env`); **ImageKit / Render / Vercel** deferred until deploy-ready  
-- [x] **4.1.4** Layout: **monorepo** - `apps/web` + `apps/api`  
-- [x] **4.1.5** Lock DB choice: **MySQL + TiDB Cloud Starter**  
+- [x] **4.1.1** `AGENTS.md` + Cursor rules (`.cursor/rules/`)
+- [ ] **4.1.2** Auth MCPs / CLIs as needed
+- [~] **4.1.3** Cloud projects: **TiDB Cloud Starter** done (+ `apps/api/.env`); **ImageKit / Render / Vercel** deferred until deploy-ready
+- [x] **4.1.4** Layout: **monorepo** - `apps/web` + `apps/api`
+- [x] **4.1.5** Lock DB choice: **MySQL + TiDB Cloud Starter**
 
 ---
 
 ## 5. Branding assets
 
-| Asset | Notes |
-| ----- | ----- |
-| Logo (SVG + PNG) | Light + dark friendly; `apps/web/public/` |
-| Favicons | `favicon.ico`, 32px, apple-touch-icon |
-| OG image | 1200×630 for previews / README |
-| Cover placeholder | Empty-state artwork |
-| Color system | CSS variables; music-catalog look (e.g. ink + lime, or charcoal + amber) - avoid generic purple AI UI |
+| Asset             | Notes                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| Logo (SVG + PNG)  | Light + dark friendly; `apps/web/public/`                                                             |
+| Favicons          | `favicon.ico`, 32px, apple-touch-icon                                                                 |
+| OG image          | 1200×630 for previews / README                                                                        |
+| Cover placeholder | Empty-state artwork                                                                                   |
+| Color system      | CSS variables; music-catalog look (e.g. ink + lime, or charcoal + amber) - avoid generic purple AI UI |
 
 ---
 
@@ -253,9 +256,9 @@ song_artists   (song_id, artist_id)  UNIQUE + FKs CASCADE
 ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 ```
 
-- Song avg = `AVG(ratings.value)`  
-- Artist avg = documented rule (avg of song avgs **or** avg of all ratings on their songs)  
-- Ship Prisma schema + migrations + seed in the repo  
+- Song avg = `AVG(ratings.value)`
+- Artist avg = documented rule (avg of song avgs **or** avg of all ratings on their songs)
+- Ship Prisma schema + migrations + seed in the repo
 
 ---
 
@@ -263,61 +266,64 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ### A. Must build (gaps)
 
-| # | Feature |
-| - | ------- |
-| A1 | Register / login (name, email) - replace hardcoded admin |
-| A2 | Normalized DB + FKs + `song_artists` |
-| A3 | Per-user ratings 1–5 + true averages |
-| A4 | **Home**: Top 10 Songs + Top 10 Artists + rate + New Song |
-| A5 | ImageKit covers |
-| A6 | Migrations + seed in repo |
-| A7 | Screenshots in repo root |
-| A8 | Validations documented in README |
+| #   | Feature                                                   |
+| --- | --------------------------------------------------------- |
+| A1  | Register / login (name, email) - replace hardcoded admin  |
+| A2  | Normalized DB + FKs + `song_artists`                      |
+| A3  | Per-user ratings 1–5 + true averages                      |
+| A4  | **Home**: Top 10 Songs + Top 10 Artists + rate + New Song |
+| A5  | ImageKit covers                                           |
+| A6  | Migrations + seed in repo                                 |
+| A7  | Screenshots in repo root                                  |
+| A8  | Validations documented in README                          |
 
 ### B. Revamp existing ideas
 
-| # | Feature | Goal |
-| - | ------- | ---- |
-| B1 | Songs / rate | Professional cards/table, optimistic UI, toasts |
-| B2 | Artists | Name, DOB, avg; optional bio |
-| B3 | Add Song + Add Artist modal | ImageKit, multi-select, Zod, Ajax refresh |
-| B4 | Shell / nav | Cadence logo, theme toggle, auth-aware CTA |
-| B5 | Auth pages | Real login + register, clear errors |
-| B6 | About / profile | Optional polished page |
-| B7 | README | Cadence stack, env, deploy, validations |
-| B8 | Express API | TS, routers, middleware, consistent JSON errors |
+| #   | Feature                     | Goal                                            |
+| --- | --------------------------- | ----------------------------------------------- |
+| B1  | Songs / rate                | Professional cards/table, optimistic UI, toasts |
+| B2  | Artists                     | Name, DOB, avg; optional bio                    |
+| B3  | Add Song + Add Artist modal | ImageKit, multi-select, Zod, Ajax refresh       |
+| B4  | Shell / nav                 | Cadence logo, theme toggle, auth-aware CTA      |
+| B5  | Auth pages                  | Real login + register, clear errors             |
+| B6  | About / profile             | Optional polished page                          |
+| B7  | README                      | Cadence stack, env, deploy, validations         |
+| B8  | Express API                 | TS, routers, middleware, consistent JSON errors |
 
 ### C. UX quality
 
-- Dark + light on every page  
-- Toasts + descriptive errors  
-- **Skeleton loaders** while fetching (lists, cards, Home Top 10s, auth bootstrap) - **no circular spinners**  
-- Empty / error states  
-- Responsive + basic a11y  
+- Dark + light on every page
+- Toasts + descriptive errors
+- **Skeleton loaders** while fetching (lists, cards, Home Top 10s, auth bootstrap) - **no circular spinners**
+- Empty / error states
+- **Mobile responsive** (required): layouts, nav, tables/lists, forms, and modals work on small screens; touch-friendly controls; test at ~375px and desktop
+- Strip unused starter **boilerplate** (default Vite/CRA assets, demo CSS, unused template files)
+
+- Basic a11y
 
 ### D. Stretch
 
-- Docker Compose (local API + DB)  
-- Search on Home  
-- GraphQL - skip unless spare time  
+- Docker Compose (local API + DB)
+- Search on Home
+- GraphQL - skip unless spare time
 
 ---
 
 ## 8. API surface
 
-| Method | Path | Auth | Purpose |
-| ------ | ---- | ---- | ------- |
-| `POST` | `/auth/register` | No | Name, email, password |
-| `POST` | `/auth/login` | No | → JWT |
-| `GET`  | `/auth/me` | Yes | Current user |
-| `GET`  | `/songs/top` | Yes* | Top 10 by avg |
-| `GET`  | `/songs` | Yes* | All songs |
-| `POST` | `/songs` | Yes | Create + artists + cover |
-| `GET`  | `/artists/top` | Yes* | Top 10 by avg |
-| `GET`  | `/artists` | Yes* | Dropdown |
-| `POST` | `/artists` | Yes | Create from Add Song |
-| `POST` | `/songs/:id/ratings` | Yes | Upsert 1–5 |
-| `POST` | `/uploads/imagekit-auth` | Yes | Signed upload |
+| Method | Path                     | Auth | Purpose                  |
+| ------ | ------------------------ | ---- | ------------------------ |
+| `POST` | `/auth/register`         | No   | Name, email, password    |
+| `POST` | `/auth/login`            | No   | → JWT                    |
+| `GET`  | `/auth/me`               | Yes  | Current user             |
+| `GET`  | `/songs/top`             | Yes* | Top 10 by avg            |
+| `GET`  | `/songs`                 | Yes* | All songs                |
+| `POST` | `/songs`                 | Yes  | Create + artists + cover |
+| `GET`  | `/artists/top`           | Yes* | Top 10 by avg            |
+| `GET`  | `/artists`               | Yes* | Dropdown                 |
+| `POST` | `/artists`               | Yes  | Create from Add Song     |
+| `POST` | `/songs/:id/ratings`     | Yes  | Upsert 1–5               |
+| `POST` | `/uploads/imagekit-auth` | Yes  | Signed upload            |
 
 \*Prefer auth-required catalog unless you want public browse.
 
@@ -325,28 +331,28 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ## 9. Frontend routes
 
-| Route | Page |
-| ----- | ---- |
-| `/login`, `/register` | Auth |
-| `/` | Home - Top 10 songs + artists, rate, New Song |
-| `/songs/new` | Add Song (+ Add Artist dialog) |
-| `/artists` | Optional full list |
-| `/about` | Optional |
-| Header | Cadence brand + theme toggle + logout |
+| Route                 | Page                                          |
+| --------------------- | --------------------------------------------- |
+| `/login`, `/register` | Auth                                          |
+| `/`                   | Home - Top 10 songs + artists, rate, New Song |
+| `/songs/new`          | Add Song (+ Add Artist dialog)                |
+| `/artists`            | Optional full list                            |
+| `/about`              | Optional                                      |
+| Header                | Cadence brand + theme toggle + logout         |
 
 ---
 
 ## 10. Testing
 
-| Area | Tools |
-| ---- | ----- |
-| Unit | Vitest |
-| API | Supertest + Vitest (+ CI database URL) |
-| UI | Vitest + Testing Library |
-| E2E (later) | Playwright |
-| Lint / format | ESLint (incl. **import order/grouping**) + **Prettier** project-wide |
-| Git hooks | **Husky** pre-commit → **lint-staged** (`eslint --fix` + Prettier on staged files) |
-| Types | `tsc --noEmit` |
+| Area          | Tools                                                                              |
+| ------------- | ---------------------------------------------------------------------------------- |
+| Unit          | Vitest                                                                             |
+| API           | Supertest + Vitest (+ CI database URL)                                             |
+| UI            | Vitest + Testing Library                                                           |
+| E2E (later)   | Playwright                                                                         |
+| Lint / format | ESLint (incl. **import order/grouping**) + **Prettier** project-wide               |
+| Git hooks     | **Husky** pre-commit → **lint-staged** (`eslint --fix` + Prettier on staged files) |
+| Types         | `tsc --noEmit`                                                                     |
 
 **Coverage targets:** auth, artists, songs, ratings averages/upserts, ImageKit auth gate, Home smoke, theme toggle, toast on success paths.
 
@@ -356,7 +362,14 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ### `ci.yml`
 
-On PR + push to `main`: install → **lint** → **format:check (Prettier)** → typecheck → test → (optional) build. Fail on any step. Pre-commit hooks do not replace CI - CI still enforces ESLint import rules + Prettier on the full tree.
+On PR + push to `main`, parallel jobs (at minimum):
+
+1. **Frontend lint** - ESLint on `apps/web`
+2. **Frontend test** - Vitest for `cadence-web`
+3. **Backend lint** - ESLint on `apps/api`
+4. **Backend test** - Vitest for `cadence-api`
+
+Fail the workflow if any job fails. Pre-commit hooks do not replace CI.
 
 ### `telegram-notify.yml`
 
@@ -368,37 +381,37 @@ Vercel production deploy success → Telegram. Secrets: `TELEGRAM_BOT_TOKEN`, `T
 
 ### Phase 0 - Prep
 
-1. Brand everything **Cadence**  
-2. DB host locked: **MySQL + TiDB Cloud Starter** - create the Starter cluster + copy `DATABASE_URL`  
-3. Create Render + Vercel + ImageKit projects (+ wire TiDB URL into Render)  
-4. `AGENTS.md` + Cursor rules  
-5. Scaffold Vite/React **TypeScript** + Express **TypeScript** + Prisma (`strict: true` in both `tsconfig`s)  
-6. **Lint/format toolchain (project-wide):** ESLint flat config with **import order + grouping**, Prettier root config + `eslint-config-prettier`, root scripts `lint` / `format` / `format:check`  
-7. **Husky + lint-staged:** `prepare` script, `.husky/pre-commit` → lint-staged; staged `*.{ts,tsx,js,jsx}` get `eslint --fix` + `prettier --write`; other staged text files get Prettier  
-8. CI stubs: lint + Prettier check + **`tsc --noEmit`** + tests + `.env.example`  
-9. Document lint/format/hooks in `AGENTS.md`  
+1. Brand everything **Cadence**
+2. DB host locked: **MySQL + TiDB Cloud Starter** - create the Starter cluster + copy `DATABASE_URL`
+3. Create Render + Vercel + ImageKit projects (+ wire TiDB URL into Render)
+4. `AGENTS.md` + Cursor rules
+5. Scaffold Vite/React **TypeScript** + Express **TypeScript** + Prisma (`strict: true` in both `tsconfig`s)
+6. **Lint/format toolchain (project-wide):** ESLint flat config with **import order + grouping**, Prettier root config + `eslint-config-prettier`, root scripts `lint` / `format` / `format:check`
+7. **Husky + lint-staged:** `prepare` script, `.husky/pre-commit` → lint-staged; staged `*.{ts,tsx,js,jsx}` get `eslint --fix` + `prettier --write`; other staged text files get Prettier
+8. CI stubs: lint + Prettier check + **`tsc --noEmit`** + tests + `.env.example`
+9. Document lint/format/hooks in `AGENTS.md`
 
 ### Phase 1 - API
 
-Schema → auth → artists/songs/ratings → ImageKit → API tests  
+Schema → auth → artists/songs/ratings → ImageKit → API tests
 
 ### Phase 2 - Web
 
-Theme → auth → Home → Add Song/Artist → toasts/errors → logo/favicons  
+Theme → auth → Home → Add Song/Artist → toasts/errors → logo/favicons
 
 ### Phase 3 - Ship
 
-1. Deploy API → Render; Web → Vercel  
-2. CORS + production env  
-3. Telegram notify workflow  
-4. Screenshots in repo root  
-5. **Final documentation pack** (see §13) - ERD, schema doc, architecture doc  
-6. **Rewrite README** for Cadence (setup, env, deploy, validations, links to docs)  
-7. Refresh `features-status.md` to all Done  
+1. Deploy API → Render; Web → Vercel
+2. CORS + production env
+3. Telegram notify workflow
+4. Screenshots in repo root
+5. **Final documentation pack** (see §13) - ERD, schema doc, architecture doc
+6. **Rewrite README** for Cadence (setup, env, deploy, validations, links to docs)
+7. Refresh `features-status.md` to all Done
 
 ### Phase 4 - Stretch
 
-Docker / Playwright / search  
+Docker / Playwright / search
 
 ---
 
@@ -406,30 +419,30 @@ Docker / Playwright / search
 
 Create these **after** features, tests, and deploy are stable - so diagrams match the real system. Link all of them from the final README.
 
-| File | Purpose | Suggested format |
-| ---- | ------- | ---------------- |
-| **`docs/erd.md`** (or `docs/erd.mmd`) | Entity-Relationship Diagram - users, artists, songs, song_artists, ratings + cardinalities | Mermaid `erDiagram` in Markdown (renders on GitHub); optional PNG export in `docs/assets/` |
-| **`docs/database-schema.md`** | Human-readable schema: tables, columns, types, PK/FK, indexes, unique constraints, rating rules | Markdown tables + notes; keep in sync with Prisma / SQL migrations |
-| **`docs/architecture.md`** | System architecture: Vite web → Express API → SQL DB; ImageKit; Vercel / Render; auth flow; CI / Telegram | Mermaid flowchart + short prose |
-| **`README.md`** | Full rewrite for Cadence | Install, env vars, scripts, demo login, validations, deploy map, **links to the three docs above** |
+| File                                  | Purpose                                                                                                   | Suggested format                                                                                   |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **`docs/erd.md`** (or `docs/erd.mmd`) | Entity-Relationship Diagram - users, artists, songs, song_artists, ratings + cardinalities                | Mermaid `erDiagram` in Markdown (renders on GitHub); optional PNG export in `docs/assets/`         |
+| **`docs/database-schema.md`**         | Human-readable schema: tables, columns, types, PK/FK, indexes, unique constraints, rating rules           | Markdown tables + notes; keep in sync with Prisma / SQL migrations                                 |
+| **`docs/architecture.md`**            | System architecture: Vite web → Express API → SQL DB; ImageKit; Vercel / Render; auth flow; CI / Telegram | Mermaid flowchart + short prose                                                                    |
+| **`README.md`**                       | Full rewrite for Cadence                                                                                  | Install, env vars, scripts, demo login, validations, deploy map, **links to the three docs above** |
 
 ### 13.1 README update checklist (end of Phase 3)
 
-- [ ] **13.1.1** Project name **Cadence** + short description (personal portfolio app)  
-- [ ] **13.1.2** Tech stack table (TS, Vite, React, Express, Prisma, SQL host, ImageKit, Vercel, Render)  
-- [ ] **13.1.3** Local setup (web + api + DB)  
-- [ ] **13.1.4** Environment variables (no secrets committed)  
-- [ ] **13.1.5** Demo credentials (if any)  
-- [ ] **13.1.6** Documented validation rules  
-- [ ] **13.1.7** Links: `docs/erd.md`, `docs/database-schema.md`, `docs/architecture.md`  
-- [ ] **13.1.8** Links: `question.md` (product requirements), `features-status.md`  
-- [ ] **13.1.9** Screenshots  
-- [ ] **13.1.10** CI / deploy / Telegram notes (high level)  
+- [ ] **13.1.1** Project name **Cadence** + short description (personal portfolio app)
+- [ ] **13.1.2** Tech stack table (TS, Vite, React, Express, Prisma, SQL host, ImageKit, Vercel, Render)
+- [ ] **13.1.3** Local setup (web + api + DB)
+- [ ] **13.1.4** Environment variables (no secrets committed)
+- [ ] **13.1.5** Demo credentials (if any)
+- [ ] **13.1.6** Documented validation rules
+- [ ] **13.1.7** Links: `docs/erd.md`, `docs/database-schema.md`, `docs/architecture.md`
+- [ ] **13.1.8** Links: `question.md` (product requirements), `features-status.md`
+- [ ] **13.1.9** Screenshots
+- [ ] **13.1.10** CI / deploy / Telegram notes (high level)
 
 ### When to generate ERD / schema / architecture
 
-- **Draft** optional after Phase 1 (schema locked).  
-- **Finalize** in Phase 3 once API + deploy match production.  
+- **Draft** optional after Phase 1 (schema locked).
+- **Finalize** in Phase 3 once API + deploy match production.
 - Re-export if schema changes after that.
 
 ---
@@ -440,58 +453,58 @@ Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2**
 
 ### 14.1 Pre-start
 
-- [x] **14.1.1** Project name: **Cadence**  
-- [x] **14.1.2** Confirm SQL host: **MySQL + TiDB Cloud Starter**  
-- [x] **14.1.3** Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render; monorepo `apps/web` + `apps/api`  
-- [ ] **14.1.4** ESLint import order/grouping + Prettier project-wide  
-- [ ] **14.1.5** Husky pre-commit → lint-staged (auto-fix staged files)  
-- [x] **14.1.6** `AGENTS.md` + Cursor rules  
-- [~] **14.1.7** Cloud projects + GitHub secrets: TiDB done; ImageKit / Render / Vercel / secrets when deploy-ready  
+- [x] **14.1.1** Project name: **Cadence**
+- [x] **14.1.2** Confirm SQL host: **MySQL + TiDB Cloud Starter**
+- [x] **14.1.3** Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render; monorepo `apps/web` + `apps/api`
+- [x] **14.1.4** ESLint import order/grouping + Prettier project-wide
+- [x] **14.1.5** Husky pre-commit → lint-staged (auto-fix staged files)
+- [x] **14.1.6** `AGENTS.md` + Cursor rules
+- [~] **14.1.7** Cloud projects + GitHub secrets: TiDB done; ImageKit / Render / Vercel / secrets when deploy-ready
 
 ### 14.2 Product
 
-- [ ] **14.2.1** Normalized schema + seed  
-- [ ] **14.2.2** Users + auth  
-- [ ] **14.2.3** M2M song↔artist  
-- [ ] **14.2.4** Per-user ratings + averages  
-- [ ] **14.2.5** Home Top 10s + rate + New Song  
-- [ ] **14.2.6** Add Song + Ajax Add Artist  
-- [ ] **14.2.7** ImageKit  
-- [ ] **14.2.8** Validations documented  
-- [ ] **14.2.9** Screenshots  
+- [ ] **14.2.1** Normalized schema + seed
+- [ ] **14.2.2** Users + auth
+- [ ] **14.2.3** M2M song↔artist
+- [ ] **14.2.4** Per-user ratings + averages
+- [ ] **14.2.5** Home Top 10s + rate + New Song
+- [ ] **14.2.6** Add Song + Ajax Add Artist
+- [ ] **14.2.7** ImageKit
+- [ ] **14.2.8** Validations documented
+- [ ] **14.2.9** Screenshots
 
 ### 14.3 Quality & deploy
 
-- [ ] **14.3.1** Dark / light, toasts, structure, tests, CI, Telegram  
-- [ ] **14.3.2** ESLint + Prettier clean in CI; Husky/lint-staged on commit  
-- [ ] **14.3.3** Logo / favicons  
-- [ ] **14.3.4** SQL host ↔ Render ↔ Vercel live  
+- [ ] **14.3.1** Dark / light, **mobile responsive**, toasts, structure, tests, CI, Telegram
+- [ ] **14.3.2** ESLint + Prettier clean in CI; Husky/lint-staged on commit
+- [ ] **14.3.3** Logo / favicons
+- [ ] **14.3.4** SQL host ↔ Render ↔ Vercel live
 
 ### 14.4 Docs (finish line)
 
-- [ ] **14.4.1** `docs/erd.md` - ERD diagram  
-- [ ] **14.4.2** `docs/database-schema.md` - full schema reference  
-- [ ] **14.4.3** `docs/architecture.md` - project architecture  
-- [ ] **14.4.4** Final **README** rewrite with links to those docs  
-- [ ] **14.4.5** `features-status.md` marked complete 
+- [ ] **14.4.1** `docs/erd.md` - ERD diagram
+- [ ] **14.4.2** `docs/database-schema.md` - full schema reference
+- [ ] **14.4.3** `docs/architecture.md` - project architecture
+- [ ] **14.4.4** Final **README** rewrite with links to those docs
+- [ ] **14.4.5** `features-status.md` marked complete
 
 ---
 
 ## 15. Out of scope (for now)
 
-- Spotify Web API / real audio player  
-- Native mobile  
-- GraphQL (unless Phase 4)  
-- Keeping CRA + denormalized schema as-is  
+- Spotify Web API / real audio player
+- Native mobile
+- GraphQL (unless Phase 4)
+- Keeping CRA + denormalized schema as-is
 
 ---
 
 ## 16. Immediate next step
 
-1. **Done / deferred:** TiDB + `DATABASE_URL` ready; ImageKit / Render / Vercel when deploy-ready.  
-2. **Next:** Phase 0 scaffold (`apps/web` + `apps/api`, Prisma `mysql`).  
+1. **Done:** Phase 0 monorepo scaffold, lint/format/hooks, CI stub, TiDB env wiring.
+2. **Next:** Phase 1 API - migrate Prisma schema → auth → artists/songs/ratings → ImageKit → API tests.
 3. **At the end:** ERD + database schema + architecture docs + full README update (§13).
 
 ---
 
-*Refs: [`question.md`](question.md) · [`features-status.md`](features-status.md) · [`README.md`](README.md)*
+_Refs: [`question.md`](question.md) · [`features-status.md`](features-status.md) · [`README.md`](README.md)_
