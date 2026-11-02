@@ -1,10 +1,18 @@
 import { prisma } from '../lib/prisma.js';
-import { averageFromValues, compareByAverageThenName } from '../lib/ratings.js';
+import {
+  averageFromValues,
+  compareByAverageThenName,
+  compareNullableNumber,
+  compareNullableString,
+} from '../lib/ratings.js';
+import type { ListSongsQuery } from '../schemas/list-query.js';
 
 export type SongListItem = {
   id: string;
   name: string;
   releaseDate: string;
+  releaseYear: number;
+  album: string | null;
   coverUrl: string | null;
   averageRating: number | null;
   ratingCount: number;
@@ -16,10 +24,15 @@ function toDateOnly(value: Date): string {
   return value.toISOString().slice(0, 10);
 }
 
+function releaseYearFromDate(value: Date): number {
+  return value.getUTCFullYear();
+}
+
 function mapSong(song: {
   id: string;
   name: string;
   releaseDate: Date;
+  album: string | null;
   coverUrl: string | null;
   createdAt: Date;
   artists: { artist: { id: string; name: string } }[];
@@ -30,6 +43,8 @@ function mapSong(song: {
     id: song.id,
     name: song.name,
     releaseDate: toDateOnly(song.releaseDate),
+    releaseYear: releaseYearFromDate(song.releaseDate),
+    album: song.album,
     coverUrl: song.coverUrl,
     averageRating,
     ratingCount,
@@ -50,18 +65,104 @@ const songListInclude = {
   ratings: { select: { value: true } },
 } as const;
 
-/** List all songs with artists and average rating (auth required at route). */
-export async function listSongs(): Promise<SongListItem[]> {
+function matchesSongQuery(song: SongListItem, q: string): boolean {
+  const needle = q.toLowerCase();
+  if (song.name.toLowerCase().includes(needle)) {
+    return true;
+  }
+  if (song.album?.toLowerCase().includes(needle)) {
+    return true;
+  }
+  if (String(song.releaseYear).includes(needle)) {
+    return true;
+  }
+  return song.artists.some((artist) =>
+    artist.name.toLowerCase().includes(needle),
+  );
+}
+
+function sortSongs(
+  songs: SongListItem[],
+  sortBy: ListSongsQuery['sortBy'],
+  sortOrder: ListSongsQuery['sortOrder'],
+): SongListItem[] {
+  const sorted = [...songs];
+  sorted.sort((a, b) => {
+    const nameTie = a.name.localeCompare(b.name);
+    switch (sortBy) {
+      case 'rating':
+        return compareNullableNumber(
+          a.averageRating,
+          b.averageRating,
+          sortOrder,
+          nameTie,
+        );
+      case 'releaseYear':
+        return compareNullableNumber(
+          a.releaseYear,
+          b.releaseYear,
+          sortOrder,
+          nameTie,
+        );
+      case 'album':
+        return compareNullableString(a.album, b.album, sortOrder, nameTie);
+      case 'name':
+      default: {
+        const cmp = a.name.localeCompare(b.name);
+        return sortOrder === 'asc' ? cmp : -cmp;
+      }
+    }
+  });
+  return sorted;
+}
+
+/** List songs with optional search + sort (auth required at route). */
+export async function listSongs(
+  query: ListSongsQuery = { sortBy: 'name', sortOrder: 'asc' },
+): Promise<SongListItem[]> {
   const songs = await prisma.song.findMany({
     include: songListInclude,
-    orderBy: [{ name: 'asc' }, { id: 'asc' }],
   });
 
-  return songs.map(mapSong);
+  let items = songs.map(mapSong);
+  if (query.q) {
+    items = items.filter((song) => matchesSongQuery(song, query.q ?? ''));
+  }
+  return sortSongs(items, query.sortBy, query.sortOrder);
 }
 
 /** Top 10 songs by average rating (unrated last). */
 export async function listTopSongs(limit = 10): Promise<SongListItem[]> {
-  const songs = await listSongs();
+  const songs = await listSongs({ sortBy: 'name', sortOrder: 'asc' });
   return [...songs].sort(compareByAverageThenName).slice(0, limit);
+}
+
+export type SongDetail = SongListItem;
+
+export async function getSongById(id: string): Promise<SongDetail | null> {
+  const song = await prisma.song.findUnique({
+    where: { id },
+    include: songListInclude,
+  });
+  if (!song) {
+    return null;
+  }
+  return mapSong(song);
+}
+
+export async function updateSongCoverUrl(
+  id: string,
+  coverUrl: string | null,
+): Promise<SongDetail | null> {
+  const existing = await prisma.song.findUnique({ where: { id } });
+  if (!existing) {
+    return null;
+  }
+
+  await prisma.song.update({
+    where: { id },
+    data: { coverUrl },
+  });
+
+  return getSongById(id);
 }
