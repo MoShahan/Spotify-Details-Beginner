@@ -6,14 +6,15 @@ Instructions for AI coding agents and humans working in this repo.
 
 **Sources of truth**
 
-| Doc                                        | Use for                                                       |
-| ------------------------------------------ | ------------------------------------------------------------- |
-| [`plan.md`](plan.md)                       | Build order, checklist IDs (e.g. **14.2.3**), stack decisions |
-| [`question.md`](question.md)               | Product requirements                                          |
-| [`features-status.md`](features-status.md) | What’s Done / Partial / Pending                               |
-| [`AGENTS.md`](AGENTS.md)                   | How to work in the repo (this file)                           |
+| Doc                                        | Use for                                                              |
+| ------------------------------------------ | -------------------------------------------------------------------- |
+| [`TODO.md`](TODO.md)                       | **Linear checklist** - IDs like **1.1.1** (primary day-to-day to-do) |
+| [`plan.md`](plan.md)                       | Stack decisions, API tables, domain notes (reference, not the to-do) |
+| [`question.md`](question.md)               | Product requirements                                                 |
+| [`features-status.md`](features-status.md) | What’s Done / Partial / Pending                                      |
+| [`AGENTS.md`](AGENTS.md)                   | How to work in the repo (this file)                                  |
 
-When the user cites a checklist ID, open `plan.md` and do that item.
+When the user cites a checklist ID, open **`TODO.md`** first.
 
 ---
 
@@ -139,7 +140,7 @@ users          id, name, email unique, password_hash, created_at
 artists        id, name, dob, bio, created_at
 songs          id, name, release_date, cover_url, created_by_user_id, created_at
 song_artists   song_id, artist_id (M2M)
-ratings        user_id, song_id, value 1..5 (unique per user+song)
+ratings        user_id, song_id, value 1..5 decimals OK (unique per user+song)
 ```
 
 Song average = `AVG(ratings.value)`. Artist average = documented rule in README / schema docs (song avgs or all ratings on their songs).
@@ -170,7 +171,7 @@ Browser → Vercel (apps/web)
 
 ## Phase pointer
 
-See `plan.md` §12 / §16. Phase 0 scaffold is in place. Next: **Phase 1** (API schema, auth, catalog, ratings).
+See [`TODO.md`](TODO.md). Phase 0 is done. Next unchecked item starts Phase 1 at **1.1.1**.
 
 ## Cursor rules
 

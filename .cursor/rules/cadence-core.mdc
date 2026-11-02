@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Cadence core
 
-- Read `AGENTS.md` and `plan.md` first. Honor checklist IDs (e.g. **14.2.3**).
+- Read `TODO.md` for the linear checklist (IDs like **1.1.1**). Use `plan.md` for stack/API reference. Also follow `AGENTS.md`.
 - Locked: monorepo `apps/web` + `apps/api`; TypeScript strict with **no `any`** (fully type-safe); Express + Prisma MySQL (TiDB); Vite React; ImageKit; Vercel + Render.
 - Never introduce `any`, `as any`, or unjustified `@ts-ignore` / `@ts-expect-error`. Prefer Zod/`unknown` narrowing and Prisma types.
 - Do not introduce TanStack Query, Next.js, Nest, Fastify, MongoDB, or Railway unless the user asks. Use Axios for HTTP.

@@ -9,7 +9,9 @@ alwaysApply: false
 - Prisma **7**: `provider = "mysql"` in `schema.prisma` (no `url` there). Set `DATABASE_URL` in `apps/api/prisma.config.ts` + `.env` (TiDB; keep `sslaccept=strict`).
 - Client uses `@prisma/adapter-mariadb`; generated client lives under `apps/api/src/generated/prisma`.
 - Normalized models only: `User`, `Artist`, `Song`, `SongArtist`, `Rating`.
-- Ratings: per-user 1–5 with `@@unique([userId, songId])`. No rating column on `Song`.
+- `Song.releaseDate` and `Song.createdByUserId` are required; `Song.updatedAt` via `@updatedAt`.
+- Ratings: per-user value **1–5 allowing decimals** (`Decimal(2,1)`). **Zod + API must reject** values outside 1–5 (`VALIDATION_ERROR`). `@@unique([userId, songId])`. No rating column on `Song`.
 - Song↔Artist is M2M via join table - not CSV strings.
+- Prefer `onDelete: Restrict` (no cascade wipe). UI shows empty fallback strings when a related name/cover is missing.
 - Ship migrations + seed in-repo. Document average-rating rules in README/schema docs.
 - Prefer Prisma Client over raw SQL; if raw SQL is required, keep it in one place and typed. **No `any`** for query results.
