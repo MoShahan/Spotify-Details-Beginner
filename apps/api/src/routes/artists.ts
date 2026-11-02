@@ -9,6 +9,7 @@ import {
 import { idParamsSchema } from '../schemas/ids.js';
 import { listArtistsQuerySchema } from '../schemas/list-query.js';
 import {
+  createArtist,
   getArtistById,
   listArtists,
   listTopArtists,
@@ -50,18 +51,17 @@ artistsRouter.get(
 );
 
 /**
- * Create artist.
+ * Create artist (auth).
  * Current rule (API, not DB unique): reject duplicate names with 409.
- * Rules stay in the service layer so they can change later (name + DOB + nationality, etc.).
- * Full auth + insert lands in TODO 1.3.x; conflict check is enforced now.
  */
 artistsRouter.post(
   '/',
+  requireAuth,
   validateRequest(createArtistBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const { name } = createArtistBodySchema.parse(req.body);
-      const existing = await findArtistByName(name);
+      const body = createArtistBodySchema.parse(req.body);
+      const existing = await findArtistByName(body.name);
 
       if (existing) {
         res.status(409).json({
@@ -73,12 +73,8 @@ artistsRouter.post(
         return;
       }
 
-      res.status(401).json({
-        error: {
-          code: 'AUTH_REQUIRED',
-          message: 'Authentication required to create an artist',
-        },
-      });
+      const artist = await createArtist(body);
+      res.status(201).json({ artist });
     } catch (error: unknown) {
       next(error);
     }
@@ -110,7 +106,7 @@ artistsRouter.get(
 );
 
 /**
- * Update artist image URL (auth). Empty string clears. ImageKit can replace this later.
+ * Update artist image URL (auth). Empty string clears.
  */
 artistsRouter.patch(
   '/:id/image',

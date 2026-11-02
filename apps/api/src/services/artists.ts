@@ -5,6 +5,7 @@ import {
   compareNullableNumber,
   compareNullableString,
 } from '../lib/ratings.js';
+import type { CreateArtistBody } from '../schemas/artist.js';
 import type { ListArtistsQuery } from '../schemas/list-query.js';
 
 export type ArtistListItem = {
@@ -193,6 +194,29 @@ export async function getArtistById(id: string): Promise<ArtistDetail | null> {
     averageRating,
     ratingCount,
     songs,
+  };
+}
+
+export async function createArtist(
+  input: CreateArtistBody,
+): Promise<ArtistListItem> {
+  const artist = await prisma.artist.create({
+    data: {
+      name: input.name,
+      dob: input.dob ? new Date(`${input.dob}T00:00:00.000Z`) : null,
+      bio: input.bio ?? null,
+      imageUrl: input.imageUrl ?? null,
+    },
+  });
+
+  return {
+    id: artist.id,
+    name: artist.name,
+    dob: artist.dob ? toDateOnly(artist.dob) : null,
+    bio: artist.bio,
+    imageUrl: artist.imageUrl,
+    averageRating: null,
+    ratingCount: 0,
   };
 }
 
