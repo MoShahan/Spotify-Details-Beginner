@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { averageFromValues, compareByAverageThenName } from '../lib/ratings.js';
 
 export type SongListItem = {
   id: string;
@@ -15,52 +16,52 @@ function toDateOnly(value: Date): string {
   return value.toISOString().slice(0, 10);
 }
 
-function averageRating(values: { value: { toString(): string } }[]): {
-  averageRating: number | null;
-  ratingCount: number;
-} {
-  if (values.length === 0) {
-    return { averageRating: null, ratingCount: 0 };
-  }
-  const sum = values.reduce(
-    (acc, row) => acc + Number(row.value.toString()),
-    0,
-  );
-  const average = sum / values.length;
+function mapSong(song: {
+  id: string;
+  name: string;
+  releaseDate: Date;
+  coverUrl: string | null;
+  createdAt: Date;
+  artists: { artist: { id: string; name: string } }[];
+  ratings: { value: { toString(): string } }[];
+}): SongListItem {
+  const { averageRating, ratingCount } = averageFromValues(song.ratings);
   return {
-    averageRating: Math.round(average * 10) / 10,
-    ratingCount: values.length,
+    id: song.id,
+    name: song.name,
+    releaseDate: toDateOnly(song.releaseDate),
+    coverUrl: song.coverUrl,
+    averageRating,
+    ratingCount,
+    artists: song.artists.map((link) => ({
+      id: link.artist.id,
+      name: link.artist.name,
+    })),
+    createdAt: song.createdAt.toISOString(),
   };
 }
+
+const songListInclude = {
+  artists: {
+    include: {
+      artist: { select: { id: true, name: true } },
+    },
+  },
+  ratings: { select: { value: true } },
+} as const;
 
 /** List all songs with artists and average rating (auth required at route). */
 export async function listSongs(): Promise<SongListItem[]> {
   const songs = await prisma.song.findMany({
-    include: {
-      artists: {
-        include: {
-          artist: { select: { id: true, name: true } },
-        },
-      },
-      ratings: { select: { value: true } },
-    },
+    include: songListInclude,
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
   });
 
-  return songs.map((song) => {
-    const { averageRating: avg, ratingCount } = averageRating(song.ratings);
-    return {
-      id: song.id,
-      name: song.name,
-      releaseDate: toDateOnly(song.releaseDate),
-      coverUrl: song.coverUrl,
-      averageRating: avg,
-      ratingCount,
-      artists: song.artists.map((link) => ({
-        id: link.artist.id,
-        name: link.artist.name,
-      })),
-      createdAt: song.createdAt.toISOString(),
-    };
-  });
+  return songs.map(mapSong);
+}
+
+/** Top 10 songs by average rating (unrated last). */
+export async function listTopSongs(limit = 10): Promise<SongListItem[]> {
+  const songs = await listSongs();
+  return [...songs].sort(compareByAverageThenName).slice(0, limit);
 }

@@ -12,9 +12,21 @@ import {
   findMissingArtistIds,
   findSongByNameAndArtistSet,
 } from '../services/catalog-uniqueness.js';
-import { listSongs } from '../services/songs.js';
+import { listSongs, listTopSongs } from '../services/songs.js';
 
 export const songsRouter = Router();
+
+/**
+ * Top 10 songs by average rating (auth).
+ */
+songsRouter.get('/top', requireAuth, async (_req, res, next) => {
+  try {
+    const songs = await listTopSongs(10);
+    res.status(200).json({ songs });
+  } catch (error: unknown) {
+    next(error);
+  }
+});
 
 /**
  * List all songs (auth). Includes artists + average rating.

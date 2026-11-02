@@ -3,10 +3,22 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
 import { createArtistBodySchema } from '../schemas/artist.js';
-import { listArtists } from '../services/artists.js';
+import { listArtists, listTopArtists } from '../services/artists.js';
 import { findArtistByName } from '../services/catalog-uniqueness.js';
 
 export const artistsRouter = Router();
+
+/**
+ * Top 10 artists by avg of all ratings on their songs (auth).
+ */
+artistsRouter.get('/top', requireAuth, async (_req, res, next) => {
+  try {
+    const artists = await listTopArtists(10);
+    res.status(200).json({ artists });
+  } catch (error: unknown) {
+    next(error);
+  }
+});
 
 /**
  * List artists for dropdowns (auth).
