@@ -52,21 +52,19 @@ async function main() {
   await prisma.artist.deleteMany();
   await prisma.user.deleteMany();
 
-  const passwordHash = await bcrypt.hash('password123', 10);
-
-  const demo = await prisma.user.create({
+  const shahan = await prisma.user.create({
     data: {
-      name: 'Demo Listener',
-      email: 'demo@cadence.app',
-      passwordHash,
+      name: 'Shahan',
+      email: 'shahan@cadence.com',
+      passwordHash: await bcrypt.hash('Shahan@123', 10),
     },
   });
 
-  const rater = await prisma.user.create({
+  const admin = await prisma.user.create({
     data: {
-      name: 'Alex Rater',
-      email: 'alex@cadence.app',
-      passwordHash,
+      name: 'Admin',
+      email: 'admin@cadence.com',
+      passwordHash: await bcrypt.hash('Admin@123', 10),
     },
   });
 
@@ -242,26 +240,26 @@ async function main() {
 
   // Varied ratings so Top 10 order is not flat (decimals allowed)
   const ratingPlan: { userId: string; songIndex: number; value: number }[] = [
-    { userId: demo.id, songIndex: 0, value: 4.5 },
-    { userId: rater.id, songIndex: 0, value: 5 },
-    { userId: demo.id, songIndex: 1, value: 4 },
-    { userId: rater.id, songIndex: 1, value: 4.5 },
-    { userId: demo.id, songIndex: 2, value: 5 },
-    { userId: rater.id, songIndex: 2, value: 4.5 },
-    { userId: demo.id, songIndex: 3, value: 3 },
-    { userId: rater.id, songIndex: 3, value: 3.5 },
-    { userId: demo.id, songIndex: 4, value: 4.5 },
-    { userId: rater.id, songIndex: 4, value: 5 },
-    { userId: demo.id, songIndex: 5, value: 4 },
-    { userId: rater.id, songIndex: 5, value: 4 },
-    { userId: demo.id, songIndex: 6, value: 3.5 },
-    { userId: rater.id, songIndex: 6, value: 4 },
-    { userId: demo.id, songIndex: 7, value: 5 },
-    { userId: rater.id, songIndex: 7, value: 5 },
-    { userId: demo.id, songIndex: 8, value: 4 },
-    { userId: rater.id, songIndex: 8, value: 3.5 },
-    { userId: demo.id, songIndex: 9, value: 4.5 },
-    { userId: rater.id, songIndex: 9, value: 4 },
+    { userId: shahan.id, songIndex: 0, value: 4.5 },
+    { userId: admin.id, songIndex: 0, value: 5 },
+    { userId: shahan.id, songIndex: 1, value: 4 },
+    { userId: admin.id, songIndex: 1, value: 4.5 },
+    { userId: shahan.id, songIndex: 2, value: 5 },
+    { userId: admin.id, songIndex: 2, value: 4.5 },
+    { userId: shahan.id, songIndex: 3, value: 3 },
+    { userId: admin.id, songIndex: 3, value: 3.5 },
+    { userId: shahan.id, songIndex: 4, value: 4.5 },
+    { userId: admin.id, songIndex: 4, value: 5 },
+    { userId: shahan.id, songIndex: 5, value: 4 },
+    { userId: admin.id, songIndex: 5, value: 4 },
+    { userId: shahan.id, songIndex: 6, value: 3.5 },
+    { userId: admin.id, songIndex: 6, value: 4 },
+    { userId: shahan.id, songIndex: 7, value: 5 },
+    { userId: admin.id, songIndex: 7, value: 5 },
+    { userId: shahan.id, songIndex: 8, value: 4 },
+    { userId: admin.id, songIndex: 8, value: 3.5 },
+    { userId: shahan.id, songIndex: 9, value: 4.5 },
+    { userId: admin.id, songIndex: 9, value: 4 },
   ];
 
   for (const row of ratingPlan) {
@@ -275,7 +273,7 @@ async function main() {
   }
 
   console.log(
-    `Seeded ${songs.length} songs, artists, 2 users (demo@cadence.app / password123), and ratings.`,
+    `Seeded ${songs.length} songs, artists, 2 users (see apps/api/local-creds.local), and ratings.`,
   );
 }
 
