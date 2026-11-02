@@ -27,6 +27,7 @@ out/
 # Prisma
 **/prisma/generated/
 apps/api/prisma/generated/
+apps/api/src/generated/
 
 # Logs & debug
 logs/
