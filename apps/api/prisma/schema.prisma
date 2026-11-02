@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// Phase 1 will flesh out relations, indexes, and seed.
+// Scaffold models match Cadence normalized domain.
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  songs        Song[]
+  ratings      Rating[]
+
+  @@map("users")
+}
+
+model Artist {
+  id        String       @id @default(cuid())
+  name      String
+  dob       DateTime?    @db.Date
+  bio       String?      @db.Text
+  createdAt DateTime     @default(now()) @map("created_at")
+  songs     SongArtist[]
+
+  @@map("artists")
+}
+
+model Song {
+  id              String       @id @default(cuid())
+  name            String
+  releaseDate     DateTime?    @map("release_date") @db.Date
+  coverUrl        String?      @map("cover_url")
+  createdByUserId String?      @map("created_by_user_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  createdBy       User?        @relation(fields: [createdByUserId], references: [id])
+  artists         SongArtist[]
+  ratings         Rating[]
+
+  @@map("songs")
+}
+
+model SongArtist {
+  songId   String @map("song_id")
+  artistId String @map("artist_id")
+  song     Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([songId, artistId])
+  @@map("song_artists")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  songId    String   @map("song_id")
+  value     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, songId])
+  @@map("ratings")
+}
