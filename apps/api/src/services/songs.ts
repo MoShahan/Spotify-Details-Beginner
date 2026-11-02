@@ -139,9 +139,14 @@ export async function listTopSongs(limit = 10): Promise<SongListItem[]> {
   return [...songs].sort(compareByAverageThenName).slice(0, limit);
 }
 
-export type SongDetail = SongListItem;
+export type SongDetail = SongListItem & {
+  myRating: number | null;
+};
 
-export async function getSongById(id: string): Promise<SongDetail | null> {
+export async function getSongById(
+  id: string,
+  userId?: string,
+): Promise<SongDetail | null> {
   const song = await prisma.song.findUnique({
     where: { id },
     include: songListInclude,
@@ -149,7 +154,22 @@ export async function getSongById(id: string): Promise<SongDetail | null> {
   if (!song) {
     return null;
   }
-  return mapSong(song);
+
+  let myRating: number | null = null;
+  if (userId) {
+    const mine = await prisma.rating.findUnique({
+      where: { userId_songId: { userId, songId: id } },
+      select: { value: true },
+    });
+    if (mine) {
+      myRating = Number(mine.value.toString());
+    }
+  }
+
+  return {
+    ...mapSong(song),
+    myRating,
+  };
 }
 
 export async function createSong(
@@ -177,6 +197,7 @@ export async function createSong(
 export async function updateSongCoverUrl(
   id: string,
   coverUrl: string | null,
+  userId?: string,
 ): Promise<SongDetail | null> {
   const existing = await prisma.song.findUnique({ where: { id } });
   if (!existing) {
@@ -188,7 +209,7 @@ export async function updateSongCoverUrl(
     data: { coverUrl },
   });
 
-  return getSongById(id);
+  return getSongById(id, userId);
 }
 
 export type SongRatingItem = {

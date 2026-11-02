@@ -27,6 +27,7 @@ export type ArtistSongSummary = {
   coverUrl: string | null;
   averageRating: number | null;
   ratingCount: number;
+  artists: Array<{ id: string; name: string }>;
 };
 
 export type ArtistDetail = ArtistListItem & {
@@ -155,6 +156,11 @@ export async function getArtistById(id: string): Promise<ArtistDetail | null> {
               album: true,
               coverUrl: true,
               ratings: { select: { value: true } },
+              artists: {
+                select: {
+                  artist: { select: { id: true, name: true } },
+                },
+              },
             },
           },
         },
@@ -180,6 +186,10 @@ export async function getArtistById(id: string): Promise<ArtistDetail | null> {
       coverUrl: link.song.coverUrl,
       averageRating: songAvg.averageRating,
       ratingCount: songAvg.ratingCount,
+      artists: link.song.artists.map((songArtist) => ({
+        id: songArtist.artist.id,
+        name: songArtist.artist.name,
+      })),
     };
   });
 
