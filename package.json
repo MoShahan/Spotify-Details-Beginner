@@ -24,7 +24,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "fix:em-dash": "node scripts/fix-em-dash.mjs",
-    "prepare": "husky"
+    "prepare": "node ./scripts/prepare-husky.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
