@@ -61,6 +61,7 @@ Structural uniques that stay in the DB: `users.email`, `ratings (user_id, song_i
 
 ## Coming soon / flexible identity
 
+- **Lyrics:** song detail will show lyrics; the page already has a placeholder section.
 - **Artist identity:** may move to name + DOB, and later fields such as nationality (or other attributes), without relying on today's name-only rule being baked into the database.
 - **Song / artist coupling:** rules around whether creating an artist requires a song (or vice versa) can change in the API; the schema already allows artists without songs and songs with one or more artists.
 
