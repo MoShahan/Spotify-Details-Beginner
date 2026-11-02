@@ -46,6 +46,9 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | Images | **ImageKit** | Covers / CDN (no DIY S3) |
 | Frontend host | **Vercel** | |
 | Backend host | **Render** (Web Service) | |
+| Lint | **ESLint** (flat config) + **import order / grouping** | Enforce import groups project-wide |
+| Format | **Prettier** | Single style for the entire monorepo |
+| Git hooks | **Husky** + **lint-staged** | Pre-commit: lint + auto-fix staged files |
 | CI | **GitHub Actions** | Lint + typecheck + tests |
 | Notify | **Telegram** via GitHub Action | On Vercel production deploy |
 
@@ -104,6 +107,10 @@ cadence/
 ├── .github/workflows/
 │   ├── ci.yml
 │   └── telegram-notify.yml
+├── .husky/
+│   └── pre-commit            # lint-staged
+├── eslint.config.js          # root flat config (or per-package)
+├── .prettierrc / .prettierignore
 ├── AGENTS.md
 ├── .cursor/rules/
 ├── question.md              # Product requirements
@@ -113,6 +120,63 @@ cadence/
 ```
 
 *(Alternative: `/client` + `/server` — same stack.)*
+
+### 2.2 Linting, formatting & pre-commit (project-wide)
+
+**Hard requirement:** The entire Cadence monorepo follows one ESLint + Prettier standard. New code must pass lint/format locally (via hooks) and in CI.
+
+#### ESLint — import ordering & grouping
+
+Use ESLint (flat config) with an import plugin (e.g. `eslint-plugin-import` and/or `@typescript-eslint` + a dedicated order rule such as `simple-import-sort` or `import/order`).
+
+**Required import groups** (blank line between groups), applied to **all** `apps/` and `packages/`:
+
+1. Node / built-ins (`node:`, `fs`, `path`, …)  
+2. External packages (`react`, `express`, `@tanstack/…`, …)  
+3. Internal / shared aliases (`@cadence/shared`, `@/…`)  
+4. Relative parent imports (`../…`)  
+5. Relative sibling / same-folder imports (`./…`)  
+6. Side-effect / style imports (`*.css`, etc.) last  
+
+Also enforce: no unused imports, consistent type-only imports (`import type { … }`), and TypeScript-aware linting for `.ts` / `.tsx`.
+
+#### Prettier — entire project
+
+- One root **Prettier** config (`.prettierrc`) + `.prettierignore` (e.g. `dist`, `coverage`, Prisma generate output, lockfiles).  
+- Same print width, quotes, semicolons, trailing commas for **web + api + shared**.  
+- Wire `eslint-config-prettier` so ESLint never fights Prettier.  
+- Scripts: `format` / `format:check` at the repo root; CI runs `format:check`.
+
+#### Husky + lint-staged (pre-commit)
+
+Whenever something is committed:
+
+1. **Husky** `pre-commit` hook runs **lint-staged**.  
+2. **lint-staged** runs only on **staged** files:  
+   - ESLint with `--fix` (auto-fix lint issues where safe)  
+   - Prettier `--write` (reformat)  
+3. Fixed files are re-staged so the commit includes the cleaned result.  
+4. If remaining errors are not auto-fixable, the commit **fails** until the developer fixes them.
+
+Root `package.json` sketch:
+
+```json
+{
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,css,yml,yaml}": ["prettier --write"]
+  }
+}
+```
+
+Install/setup in Phase 0: `husky`, `lint-staged`, `eslint`, Prettier, import-order plugin, `eslint-config-prettier`. Document the hook in `AGENTS.md` (don’t bypass with `--no-verify` in normal workflow).
 
 ---
 
@@ -163,13 +227,13 @@ Workflow `.github/workflows/telegram-notify.yml`:
 | `.cursor/rules/*.mdc` | Express, React/UI, Prisma, testing conventions |
 | Optional skill | Only if you want a reusable “Cadence feature” skill |
 
-**Pre-start checklist**
+**4.1 Pre-start checklist**
 
-- [ ] `AGENTS.md` + Cursor rules  
-- [ ] Auth MCPs / CLIs as needed  
-- [ ] Create **Cadence** projects: ImageKit, Render, Vercel, SQL host  
-- [ ] Decide monorepo vs client/server  
-- [ ] Lock DB choice: MySQL host **or** Neon  
+- [ ] **4.1.1** `AGENTS.md` + Cursor rules  
+- [ ] **4.1.2** Auth MCPs / CLIs as needed  
+- [ ] **4.1.3** Create **Cadence** projects: ImageKit, Render, Vercel, SQL host  
+- [ ] **4.1.4** Decide monorepo vs client/server  
+- [ ] **4.1.5** Lock DB choice: MySQL host **or** Neon  
 
 ---
 
@@ -285,7 +349,8 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 | API | Supertest + Vitest (+ CI database URL) |
 | UI | Vitest + Testing Library |
 | E2E (later) | Playwright |
-| Lint / format | ESLint + Prettier |
+| Lint / format | ESLint (incl. **import order/grouping**) + **Prettier** project-wide |
+| Git hooks | **Husky** pre-commit → **lint-staged** (`eslint --fix` + Prettier on staged files) |
 | Types | `tsc --noEmit` |
 
 **Coverage targets:** auth, artists, songs, ratings averages/upserts, ImageKit auth gate, Home smoke, theme toggle, toast on success paths.
@@ -296,7 +361,7 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 ### `ci.yml`
 
-On PR + push to `main`: install → lint → typecheck → test → (optional) build. Fail on any step.
+On PR + push to `main`: install → **lint** → **format:check (Prettier)** → typecheck → test → (optional) build. Fail on any step. Pre-commit hooks do not replace CI — CI still enforces ESLint import rules + Prettier on the full tree.
 
 ### `telegram-notify.yml`
 
@@ -313,7 +378,10 @@ Vercel production deploy success → Telegram. Secrets: `TELEGRAM_BOT_TOKEN`, `T
 3. Create Render + Vercel + ImageKit + DB projects  
 4. `AGENTS.md` + Cursor rules  
 5. Scaffold Vite/React **TypeScript** + Express **TypeScript** + Prisma (`strict: true` in both `tsconfig`s)  
-6. CI stubs: lint + **`tsc --noEmit`** + tests + `.env.example`  
+6. **Lint/format toolchain (project-wide):** ESLint flat config with **import order + grouping**, Prettier root config + `eslint-config-prettier`, root scripts `lint` / `format` / `format:check`  
+7. **Husky + lint-staged:** `prepare` script, `.husky/pre-commit` → lint-staged; staged `*.{ts,tsx,js,jsx}` get `eslint --fix` + `prettier --write`; other staged text files get Prettier  
+8. CI stubs: lint + Prettier check + **`tsc --noEmit`** + tests + `.env.example`  
+9. Document lint/format/hooks in `AGENTS.md`  
 
 ### Phase 1 — API
 
@@ -350,18 +418,18 @@ Create these **after** features, tests, and deploy are stable — so diagrams ma
 | **`docs/architecture.md`** | System architecture: Vite web → Express API → SQL DB; ImageKit; Vercel / Render; auth flow; CI / Telegram | Mermaid flowchart + short prose |
 | **`README.md`** | Full rewrite for Cadence | Install, env vars, scripts, demo login, validations, deploy map, **links to the three docs above** |
 
-### README update checklist (end of Phase 3)
+### 13.1 README update checklist (end of Phase 3)
 
-- [ ] Project name **Cadence** + short description (personal portfolio app)  
-- [ ] Tech stack table (TS, Vite, React, Express, Prisma, SQL host, ImageKit, Vercel, Render)  
-- [ ] Local setup (web + api + DB)  
-- [ ] Environment variables (no secrets committed)  
-- [ ] Demo credentials (if any)  
-- [ ] Documented validation rules  
-- [ ] Links: `docs/erd.md`, `docs/database-schema.md`, `docs/architecture.md`  
-- [ ] Links: `question.md` (product requirements), `features-status.md`  
-- [ ] Screenshots  
-- [ ] CI / deploy / Telegram notes (high level)  
+- [ ] **13.1.1** Project name **Cadence** + short description (personal portfolio app)  
+- [ ] **13.1.2** Tech stack table (TS, Vite, React, Express, Prisma, SQL host, ImageKit, Vercel, Render)  
+- [ ] **13.1.3** Local setup (web + api + DB)  
+- [ ] **13.1.4** Environment variables (no secrets committed)  
+- [ ] **13.1.5** Demo credentials (if any)  
+- [ ] **13.1.6** Documented validation rules  
+- [ ] **13.1.7** Links: `docs/erd.md`, `docs/database-schema.md`, `docs/architecture.md`  
+- [ ] **13.1.8** Links: `question.md` (product requirements), `features-status.md`  
+- [ ] **13.1.9** Screenshots  
+- [ ] **13.1.10** CI / deploy / Telegram notes (high level)  
 
 ### When to generate ERD / schema / architecture
 
@@ -373,39 +441,44 @@ Create these **after** features, tests, and deploy are stable — so diagrams ma
 
 ## 14. Master checklist
 
-### Pre-start
+Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2** not done?”).
 
-- [x] Project name: **Cadence**  
-- [ ] Confirm SQL host: MySQL (TiDB/Aiven) **or** Neon Postgres  
-- [ ] Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render  
-- [ ] `AGENTS.md` + rules  
-- [ ] Cloud projects + GitHub secrets placeholders  
+### 14.1 Pre-start
 
-### Product
+- [x] **14.1.1** Project name: **Cadence**  
+- [ ] **14.1.2** Confirm SQL host: MySQL (TiDB/Aiven) **or** Neon Postgres  
+- [ ] **14.1.3** Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render  
+- [ ] **14.1.4** ESLint import order/grouping + Prettier project-wide  
+- [ ] **14.1.5** Husky pre-commit → lint-staged (auto-fix staged files)  
+- [ ] **14.1.6** `AGENTS.md` + rules  
+- [ ] **14.1.7** Cloud projects + GitHub secrets placeholders  
 
-- [ ] Normalized schema + seed  
-- [ ] Users + auth  
-- [ ] M2M song↔artist  
-- [ ] Per-user ratings + averages  
-- [ ] Home Top 10s + rate + New Song  
-- [ ] Add Song + Ajax Add Artist  
-- [ ] ImageKit  
-- [ ] Validations documented  
-- [ ] Screenshots  
+### 14.2 Product
 
-### Quality & deploy
+- [ ] **14.2.1** Normalized schema + seed  
+- [ ] **14.2.2** Users + auth  
+- [ ] **14.2.3** M2M song↔artist  
+- [ ] **14.2.4** Per-user ratings + averages  
+- [ ] **14.2.5** Home Top 10s + rate + New Song  
+- [ ] **14.2.6** Add Song + Ajax Add Artist  
+- [ ] **14.2.7** ImageKit  
+- [ ] **14.2.8** Validations documented  
+- [ ] **14.2.9** Screenshots  
 
-- [ ] Dark / light, toasts, structure, tests, CI, Telegram  
-- [ ] Logo / favicons  
-- [ ] SQL host ↔ Render ↔ Vercel live  
+### 14.3 Quality & deploy
 
-### Docs (finish line)
+- [ ] **14.3.1** Dark / light, toasts, structure, tests, CI, Telegram  
+- [ ] **14.3.2** ESLint + Prettier clean in CI; Husky/lint-staged on commit  
+- [ ] **14.3.3** Logo / favicons  
+- [ ] **14.3.4** SQL host ↔ Render ↔ Vercel live  
 
-- [ ] `docs/erd.md` — ERD diagram  
-- [ ] `docs/database-schema.md` — full schema reference  
-- [ ] `docs/architecture.md` — project architecture  
-- [ ] Final **README** rewrite with links to those docs  
-- [ ] `features-status.md` marked complete  
+### 14.4 Docs (finish line)
+
+- [ ] **14.4.1** `docs/erd.md` — ERD diagram  
+- [ ] **14.4.2** `docs/database-schema.md` — full schema reference  
+- [ ] **14.4.3** `docs/architecture.md` — project architecture  
+- [ ] **14.4.4** Final **README** rewrite with links to those docs  
+- [ ] **14.4.5** `features-status.md` marked complete 
 
 ---
 
