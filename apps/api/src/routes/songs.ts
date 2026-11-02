@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { normalizeArtistIds } from '../lib/artist-ids.js';
+import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
 import {
   songIdParamsSchema,
@@ -11,8 +12,21 @@ import {
   findMissingArtistIds,
   findSongByNameAndArtistSet,
 } from '../services/catalog-uniqueness.js';
+import { listSongs } from '../services/songs.js';
 
 export const songsRouter = Router();
+
+/**
+ * List all songs (auth). Includes artists + average rating.
+ */
+songsRouter.get('/', requireAuth, async (_req, res, next) => {
+  try {
+    const songs = await listSongs();
+    res.status(200).json({ songs });
+  } catch (error: unknown) {
+    next(error);
+  }
+});
 
 /**
  * Create song + artist links.
