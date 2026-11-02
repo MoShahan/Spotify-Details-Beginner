@@ -1,5 +1,3 @@
-
-
 const EM_DASH = '\u2014';
 const HYPHEN = '-';
 
