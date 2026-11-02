@@ -129,7 +129,7 @@ songsRouter.get(
   async (req, res, next) => {
     try {
       const { id } = idParamsSchema.parse(req.params);
-      const song = await getSongById(id);
+      const song = await getSongById(id, req.auth?.userId);
       if (!song) {
         res.status(404).json({
           error: { code: 'NOT_FOUND', message: 'Song not found' },
@@ -155,7 +155,11 @@ songsRouter.patch(
     try {
       const { id } = idParamsSchema.parse(req.params);
       const body = updateSongCoverBodySchema.parse(req.body);
-      const song = await updateSongCoverUrl(id, body.coverUrl);
+      const song = await updateSongCoverUrl(
+        id,
+        body.coverUrl,
+        req.auth?.userId,
+      );
       if (!song) {
         res.status(404).json({
           error: { code: 'NOT_FOUND', message: 'Song not found' },
