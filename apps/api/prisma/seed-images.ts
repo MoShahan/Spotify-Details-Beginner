@@ -92,9 +92,30 @@ async function lookupItunesArtistSongArtwork(
     : null;
 }
 
+/** Prefer these when auto-lookup returns cover art / wrong people. */
+const ARTIST_IMAGE_OVERRIDES: Record<string, string> = {
+  'Billie Eilish':
+    'https://upload.wikimedia.org/wikipedia/commons/c/c7/BillieEilishO2140725-39_-_54665577407_%28cropped%29.jpg',
+  KK: 'https://upload.wikimedia.org/wikipedia/commons/0/09/KK_%28125%29.jpg',
+  'Faheem Abdullah':
+    'https://th-i.thgim.com/public/incoming/9l194i/article70619770.ece/alternates/LANDSCAPE_1200/0K1A0146.jpg',
+  'Sagi Abitbul':
+    'https://is1-ssl.mzstatic.com/image/thumb/Features115/v4/06/59/73/0659739f-1c09-ab49-5a66-f5a454d22540/pr_source.png/1200x630cw.png',
+  'Guy Haliva':
+    'https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d1/6f/2e/d16f2ed9-79cf-89fc-c945-149665d17d2b/pr_source.png/1200x630cw.png',
+  'Amir Ameer':
+    'https://rekhta.pc.cdn.bitgravity.com/Images/Shayar/Round/amir-ameer.png',
+  AliSoomroMusic:
+    'https://image-cdn-ak.spotifycdn.com/image/ab67616100005174b197a2b4f9ebab9044bf3f2b',
+};
+
 export async function lookupArtistImageUrl(
   artistName: string,
 ): Promise<string | null> {
+  const override = ARTIST_IMAGE_OVERRIDES[artistName];
+  if (override) {
+    return override;
+  }
   return (
     (await lookupDeezerArtistImageUrl(artistName)) ??
     (await lookupItunesArtistSongArtwork(artistName))
