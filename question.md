@@ -61,7 +61,7 @@ We would like to have the following entities in the application.
 Submit your application on  
 https://docs.google.com/forms/d/1dq9t7EHSLMJOSOWAPdhtsPNCGAgWZCXu9d9-Kmwybl8
 
-*(Note: Submissions without github link to assignment will be rejected)*
+_(Note: Submissions without github link to assignment will be rejected)_
 
 Kindly email your queries at `hireme+fresh2022@deltax.com` with subject - `Fresher Software Engineer - YOURNAME`.
 
@@ -75,7 +75,7 @@ Note: Design/Styling/CSS is not critical; functionality is.
 - Add Song
 - Add Artist
 
-*(Original document includes mock UI screenshots for these screens.)*
+_(Original document includes mock UI screenshots for these screens.)_
 
 ---
 

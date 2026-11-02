@@ -1,69 +1,57 @@
 {
-  "name": "spotify",
+  "name": "cadence",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/icons-material": "^5.8.2",
-    "@mui/material": "^5.8.2",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^0.27.2",
-    "fs": "^0.0.1-security",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-plugin-cadence": "file:eslint-plugin-cadence",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.5.2"
-  },
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "eslint-plugin-cadence"
+  ],
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint \"src/**/*.{js,jsx}\" \"songs-db/**/*.{js,jsx}\" \"eslint-plugin-cadence/**/*.js\" --no-error-on-unmatched-pattern",
-    "lint:fix": "npm run lint -- --fix",
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:web": "npm run dev -w cadence-web",
+    "dev:api": "npm run dev -w cadence-api",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "lint:web": "eslint \"apps/web/**/*.{ts,tsx,js,jsx}\"",
+    "lint:api": "eslint \"apps/api/**/*.{ts,tsx,js,jsx}\" --ignore-pattern \"apps/api/src/generated/**\"",
+    "lint:fix": "eslint . --fix",
+    "test:web": "npm test -w cadence-web",
+    "test:api": "npm test -w cadence-api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
     "fix:em-dash": "node scripts/fix-em-dash.mjs",
     "prepare": "husky"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "plugins": [
-      "cadence"
-    ],
-    "rules": {
-      "cadence/no-em-dash": "error"
-    }
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-cadence": "*",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.5.3",
+    "typescript-eslint": "^8.26.1"
   },
   "lint-staged": {
     "*": [
       "node scripts/fix-em-dash.mjs"
     ],
-    "*.{js,jsx}": [
-      "eslint --fix"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,yml,yaml,html}": [
+      "prettier --write"
     ]
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "engines": {
+    "node": ">=20"
   }
 }

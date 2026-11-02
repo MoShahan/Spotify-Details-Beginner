@@ -1,168 +1,57 @@
 # Cadence
 
-Personal full-stack music catalog - browse top songs and artists, rate tracks, and add new songs/artists. Built to showcase clean API design, SQL modeling, and a polished React UI.
+Personal full-stack music catalog - rate songs, rank artists, add covers.
 
-> Current app: Node.js + Express + MySQL + React. A full rebuild is planned in [`plan.md`](plan.md).  
-> In-app features are also summarized on the **Home** page after login.
+**Stack:** TypeScript monorepo · Vite + React (`apps/web`) · Express + Prisma MySQL / TiDB (`apps/api`) · Vercel + Render (deploy later)
 
----
-
-## Login Credentials
-
-| Field    | Value   |
-| -------- | ------- |
-| Username | `admin` |
-| Password | `admin` |
-
----
-
-## Tech Stack
-
-| Layer    | Technology                          |
-| -------- | ----------------------------------- |
-| Frontend | React 18, React Router, Material UI |
-| Backend  | Node.js, Express                    |
-| Database | MySQL (`spotify-db`)                |
-| HTTP     | Axios                               |
-
----
-
-## Features
-
-- **Login** - gated access with demo credentials
-- **Songs** - Top 10 by rating, artwork, release date, artists; rate 1–5 stars; See More / See Less
-- **Artists** - Top 10 by average song rating; DOB and song list
-- **Add New Song** - name, release date, artwork filename, multi-select artists
-- **Add New Artist** - modal on the Add Song page (name, DOB, bio)
-- **About Me** - developer details
-- **Logout** - return to login
-
----
-
-## Project Structure
+## Repo layout
 
 ```text
-Spotify-Details-Beginner/
-├── public/                 # CRA public assets
-├── src/
-│   ├── components/         # Login, Navbar, HomeProperties
-│   ├── pages/              # Home, Songs, Artists, AddSong, AboutUs
-│   ├── datas/              # Early mock JSON (songs / artists)
-│   ├── styles/             # CSS
-│   └── artwork/            # Song cover images (by filename)
-├── songs-db/               # Express + MySQL backend
-│   └── index.js
-├── question.md             # Original DeltaX problem statement
-├── features-status.md      # Present vs pending features
-└── README.md
+apps/web   # Frontend (Vite + React + TS)
+apps/api   # Backend (Express + Prisma + TS)
 ```
 
----
+See [`AGENTS.md`](AGENTS.md) and [`plan.md`](plan.md) for conventions and the build checklist.
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (npm included)
-- [MySQL](https://www.mysql.com/) running locally
-- A MySQL schema named `spotify-db` (or change the name in config - see below)
+- Node.js 20+
+- TiDB Cloud Starter connection string in `apps/api/.env` (`DATABASE_URL`)
 
----
-
-## Database Setup
-
-1. Create a MySQL schema (database), e.g. `spotify-db`.
-2. Create tables for **artists** and **songs** (with fields matching the app: artist name / DOB / bio; song name / artists / date / image / ratings).
-3. Open `songs-db/index.js` and update the connection pool:
-
-```js
-const db = mysql.createPool({
-  host: "localhost",
-  user: "root",        // ← change to your MySQL username
-  password: "password", // ← change to your MySQL password
-  database: "spotify-db", // ← change if you use another schema name
-});
-```
-
-| Setting    | Default in code | What to do                          |
-| ---------- | --------------- | ----------------------------------- |
-| `user`     | `root`          | Change to your own MySQL username   |
-| `password` | `password`      | Change to your personal password    |
-| `database` | `spotify-db`    | Use this schema, or set your own name |
-
----
-
-## Installation & Run
-
-You need **two terminals** - frontend and backend.
-
-### 1. Backend (`songs-db`)
+## Setup
 
 ```bash
-cd songs-db
 npm install
-npm run devStart
+cp apps/api/.env.example apps/api/.env   # if needed; paste DATABASE_URL
+cp apps/web/.env.example apps/web/.env   # optional; defaults to localhost:4000
 ```
 
-Uses **nodemon** and listens on **http://localhost:3001**.
-
-Or without nodemon:
+Generate Prisma client (after `DATABASE_URL` is set):
 
 ```bash
-npm start
+npm run prisma:generate -w cadence-api
 ```
 
-### 2. Frontend (project root)
+## Develop
 
 ```bash
-# from project root
-npm install
-npm start
+npm run dev:api   # http://localhost:4000
+npm run dev:web   # http://localhost:5173
 ```
 
-Runs in development mode. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+## Quality
 
----
+```bash
+npm run lint
+npm run format:check
+npm run typecheck
+npm test
+```
 
-## API Endpoints
+Pre-commit (Husky → lint-staged): em-dash fix, ESLint `--fix`, Prettier on staged files.
 
-Backend base URL: `http://localhost:3001`
+## Docs
 
-| Method | Endpoint         | Description        |
-| ------ | ---------------- | ------------------ |
-| `GET`  | `/get/songs`     | List all songs     |
-| `GET`  | `/get/artists`   | List all artists   |
-| `POST` | `/add/song`      | Add a new song     |
-| `POST` | `/add/artist`    | Add a new artist   |
-| `POST` | `/add/ratings`   | Update song rating |
-
----
-
-## App Routes
-
-| Path       | Page                                      |
-| ---------- | ----------------------------------------- |
-| `/`        | Login                                     |
-| `/home`    | Home (feature overview)                   |
-| `/songs`   | Songs list + ratings                      |
-| `/artists` | Artists list                              |
-| `/add`     | Add new song (and new artist via modal)   |
-| `/about`   | About the developer                       |
-
----
-
-## Artwork Tips
-
-On **Add New Song**, the Artwork field expects a **filename with extension** (e.g. `cover.jpg`). Place the image file in `src/artwork/` so the Songs page can load it.
-
----
-
-## Related Docs
-
-- [`question.md`](question.md) - original DeltaX assignment brief  
-- [`features-status.md`](features-status.md) - what’s implemented vs still pending  
-
----
-
-## Author
-
-**Mohammed Shahan**  
-P. A. College of Engineering · USN: `4PA18CS064`
+- [`question.md`](question.md) - product requirements
+- [`features-status.md`](features-status.md) - feature gap list
+- [`plan.md`](plan.md) - phases and checklist IDs
