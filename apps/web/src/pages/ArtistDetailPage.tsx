@@ -1,23 +1,110 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
+import { CatalogThumb } from '../components/catalog/CatalogThumb';
+import { SortableTh } from '../components/catalog/SortableTh';
 import { Skeleton } from '../components/ui/skeleton';
 import { api, getApiErrorMessage } from '../lib/api';
 import {
   type ArtistDetail,
+  type ArtistDetailSong,
   type CatalogArtist,
   formatRating,
+  type SongSortBy,
+  type SortOrder,
 } from '../lib/catalog';
+import { nextSortState } from '../lib/sort';
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; artist: ArtistDetail };
 
+const EMPTY_SONGS: ArtistDetailSong[] = [];
+
+function compareNullableNumber(
+  a: number | null,
+  b: number | null,
+  order: SortOrder,
+  tieBreak: number,
+): number {
+  if (a === null && b === null) {
+    return tieBreak;
+  }
+  if (a === null) {
+    return 1;
+  }
+  if (b === null) {
+    return -1;
+  }
+  if (a !== b) {
+    return order === 'asc' ? a - b : b - a;
+  }
+  return tieBreak;
+}
+
+function compareNullableString(
+  a: string | null,
+  b: string | null,
+  order: SortOrder,
+  tieBreak: number,
+): number {
+  const left = a?.trim() ? a : null;
+  const right = b?.trim() ? b : null;
+  if (left === null && right === null) {
+    return tieBreak;
+  }
+  if (left === null) {
+    return 1;
+  }
+  if (right === null) {
+    return -1;
+  }
+  const cmp = left.localeCompare(right);
+  return cmp === 0 ? tieBreak : order === 'asc' ? cmp : -cmp;
+}
+
+function sortArtistSongs(
+  songs: ArtistDetailSong[],
+  sortBy: SongSortBy,
+  sortOrder: SortOrder,
+): ArtistDetailSong[] {
+  const sorted = [...songs];
+  sorted.sort((a, b) => {
+    const nameTie = a.name.localeCompare(b.name);
+    switch (sortBy) {
+      case 'rating':
+        return compareNullableNumber(
+          a.averageRating,
+          b.averageRating,
+          sortOrder,
+          nameTie,
+        );
+      case 'releaseYear':
+        return compareNullableNumber(
+          a.releaseYear,
+          b.releaseYear,
+          sortOrder,
+          nameTie,
+        );
+      case 'album':
+        return compareNullableString(a.album, b.album, sortOrder, nameTie);
+      case 'name':
+      default: {
+        const cmp = a.name.localeCompare(b.name);
+        return sortOrder === 'asc' ? cmp : -cmp;
+      }
+    }
+  });
+  return sorted;
+}
+
 export function ArtistDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
+  const [sortBy, setSortBy] = useState<SongSortBy>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   useEffect(() => {
     if (!id) {
@@ -70,6 +157,20 @@ export function ArtistDetailPage() {
         },
       };
     });
+  }
+
+  const songsForSort =
+    state.status === 'ready' ? state.artist.songs : EMPTY_SONGS;
+
+  const sortedSongs = useMemo(
+    () => sortArtistSongs(songsForSort, sortBy, sortOrder),
+    [songsForSort, sortBy, sortOrder],
+  );
+
+  function handleSort(column: SongSortBy) {
+    const next = nextSortState(sortBy, sortOrder, column);
+    setSortBy(next.sortBy);
+    setSortOrder(next.sortOrder);
   }
 
   if (state.status === 'loading') {
@@ -160,27 +261,104 @@ export function ArtistDetailPage() {
             No songs linked yet.
           </p>
         ) : (
-          <ul className="cadence-panel divide-y divide-[var(--cadence-border)] overflow-hidden">
-            {artist.songs.map((song) => (
-              <li key={song.id}>
-                <Link
-                  to={`/songs/${song.id}`}
-                  className="flex items-center justify-between gap-3 px-3 py-3 transition-colors hover:bg-[var(--cadence-muted)]/55"
-                >
-                  <span className="min-w-0 truncate font-medium">
-                    {song.name}
-                    <span className="ml-2 font-normal text-[var(--cadence-fg-muted)]">
+          <div className="cadence-panel overflow-x-auto">
+            <table className="w-full min-w-[40rem] border-collapse text-sm">
+              <thead className="bg-[var(--cadence-muted)]/45">
+                <tr>
+                  <th
+                    scope="col"
+                    className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+                  >
+                    <span className="sr-only">Cover</span>
+                  </th>
+                  <SortableTh
+                    label="Name"
+                    column="name"
+                    activeColumn={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                  <th
+                    scope="col"
+                    className="border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+                  >
+                    Artists
+                  </th>
+                  <SortableTh
+                    label="Album"
+                    column="album"
+                    activeColumn={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                  <SortableTh
+                    label="Year"
+                    column="releaseYear"
+                    activeColumn={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                  <SortableTh
+                    label="Rating"
+                    column="rating"
+                    activeColumn={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                    align="right"
+                  />
+                </tr>
+              </thead>
+              <tbody>
+                {sortedSongs.map((song) => (
+                  <tr
+                    key={song.id}
+                    className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
+                  >
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-2">
+                      <Link to={`/songs/${song.id}`} tabIndex={-1}>
+                        <CatalogThumb
+                          src={song.coverUrl}
+                          alt={`${song.name} cover`}
+                        />
+                      </Link>
+                    </td>
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">
+                      <Link
+                        to={`/songs/${song.id}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {song.name}
+                      </Link>
+                    </td>
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-[var(--cadence-fg-muted)]">
+                      {song.artists.length === 0
+                        ? '-'
+                        : song.artists.map((a, index) => (
+                            <span key={a.id}>
+                              {index > 0 ? ', ' : null}
+                              <Link
+                                to={`/artists/${a.id}`}
+                                className="underline-offset-4 hover:underline"
+                              >
+                                {a.name}
+                              </Link>
+                            </span>
+                          ))}
+                    </td>
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-[var(--cadence-fg-muted)]">
+                      {song.album ?? '-'}
+                    </td>
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 tabular-nums text-[var(--cadence-fg-muted)]">
                       {song.releaseYear}
-                      {song.album ? ` · ${song.album}` : ''}
-                    </span>
-                  </span>
-                  <span className="shrink-0 tabular-nums text-sm">
-                    {formatRating(song.averageRating)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    </td>
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-right font-medium tabular-nums text-[var(--cadence-fg)]">
+                      {formatRating(song.averageRating)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </section>

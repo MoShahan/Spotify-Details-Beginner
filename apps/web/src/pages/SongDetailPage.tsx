@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
+import { SongRatingControl } from '../components/catalog/SongRatingControl';
+import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import { api, getApiErrorMessage } from '../lib/api';
-import { type CatalogSong, formatRating } from '../lib/catalog';
+import { formatRating, type SongDetail } from '../lib/catalog';
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; song: CatalogSong };
+  | { status: 'ready'; song: SongDetail };
 
 export function SongDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
+  const [editingRating, setEditingRating] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -26,9 +29,10 @@ export function SongDetailPage() {
     async function load() {
       setState({ status: 'loading' });
       try {
-        const res = await api.get<{ song: CatalogSong }>(`/songs/${id}`);
+        const res = await api.get<{ song: SongDetail }>(`/songs/${id}`);
         if (!cancelled) {
           setState({ status: 'ready', song: res.data.song });
+          setEditingRating(false);
         }
       } catch (error: unknown) {
         if (!cancelled) {
@@ -46,11 +50,20 @@ export function SongDetailPage() {
     };
   }, [id]);
 
+  async function reloadSong() {
+    if (!id) {
+      return;
+    }
+    const res = await api.get<{ song: SongDetail }>(`/songs/${id}`);
+    setState({ status: 'ready', song: res.data.song });
+    setEditingRating(false);
+  }
+
   async function saveCover(coverUrl: string | null) {
     if (!id) {
       throw new Error('Missing song id');
     }
-    const res = await api.patch<{ song: CatalogSong }>(`/songs/${id}/cover`, {
+    const res = await api.patch<{ song: SongDetail }>(`/songs/${id}/cover`, {
       coverUrl,
     });
     setState({ status: 'ready', song: res.data.song });
@@ -83,6 +96,7 @@ export function SongDetailPage() {
   }
 
   const { song } = state;
+  const showRatingEditor = song.myRating === null || editingRating;
 
   return (
     <section className="flex flex-col gap-8">
@@ -149,6 +163,41 @@ export function SongDetailPage() {
               </dd>
             </div>
           </dl>
+
+          <div className="cadence-panel flex flex-col gap-3 p-4">
+            <h2 className="text-sm font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase">
+              Your rating
+            </h2>
+            {showRatingEditor ? (
+              <SongRatingControl
+                songId={song.id}
+                initialValue={song.myRating}
+                showCancel={song.myRating !== null}
+                onCancel={() => {
+                  setEditingRating(false);
+                }}
+                onRated={() => {
+                  void reloadSong();
+                }}
+              />
+            ) : (
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm font-medium tabular-nums">
+                  {formatRating(song.myRating)}
+                </p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setEditingRating(true);
+                  }}
+                >
+                  Edit rating
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
