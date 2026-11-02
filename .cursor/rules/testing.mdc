@@ -1,0 +1,13 @@
+---
+description: Testing conventions (Vitest, API, UI)
+globs: "**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+# Testing
+
+- Unit/UI: Vitest + Testing Library. API: Supertest + Vitest.
+- Cover auth, artists, songs, ratings averages/upserts, ImageKit auth gate, Home smoke, theme toggle, success toasts.
+- Prefer testing behavior and public API over implementation details.
+- Use test DB URL or isolated setup when hitting Prisma; never point destructive tests at prod TiDB without explicit intent.
+- Keep tests typed; colocate `*.test.ts(x)` near code or under a clear `tests/` folder per app.

@@ -4,7 +4,7 @@
 
 This plan rebuilds the current codebase into a complete, professional product using [`question.md`](question.md) as the **product requirements** source and [`features-status.md`](features-status.md) as the gap list - framed as a portfolio app, not coursework.
 
-**Status:** Planning. Name locked: **Cadence**. Ready for Phase 0 after DB hosting choice in §2.1 is confirmed.
+**Status:** Planning. Name locked: **Cadence**. DB locked: **MySQL + TiDB Cloud Starter**. Ready for Phase 0.
 
 ---
 
@@ -34,14 +34,15 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 | Why not Next | - | Keeps Express as the real backend on Render |
 | UI | **Tailwind CSS + shadcn/ui** | Polished dark / light themes |
 | Theme | Class-based light/dark toggle | Every page |
-| Data fetching | **TanStack Query** | Caching, errors, retries; typed query keys / responses |
+| Data fetching | **Axios only** (no TanStack Query) | Typed API client helpers; loading/error in component state or small hooks |
+| Loading UI | **Skeleton loaders** | While fetching data - **no** circular spinners |
 | Forms | **React Hook Form + Zod** | Infer form types from Zod (`z.infer<>`) |
 | Toasts | **Sonner** | Success / error feedback |
 | Routing | **React Router** | Auth + home + add song |
 | Backend | **Express + TypeScript** | Typed req/res via middleware; no Nest/Fastify/etc. |
 | Shared types | **`packages/shared` (optional)** or Zod schemas imported by API + web | One source of truth for DTOs |
 | ORM | **Prisma** | Generated TS client + migrations; MySQL or Postgres |
-| Database | **SQL (see §2.1)** | Normalized schema, join tables, FKs - not Mongo |
+| Database | **MySQL via TiDB Cloud Starter** (see §2.1) | Normalized schema, join tables, FKs - not Mongo |
 | Auth | **JWT + bcrypt** | User name + email |
 | Images | **ImageKit** | Covers / CDN (no DIY S3) |
 | Frontend host | **Vercel** | |
@@ -77,23 +78,16 @@ Rename package titles, HTML `<title>`, logos, and README to **Cadence** during P
 
 You said you **don’t use Railway** - plan does **not** depend on it.
 
-#### Practical recommendation for Cadence
+#### Decision: **MySQL + TiDB Cloud Starter** (locked)
 
-Pick one:
+- **Prod / shared cloud DB:** [TiDB Cloud Starter](https://tidbcloud.com) (formerly Serverless) - MySQL-compatible, **free monthly quota** (not a time-limited trial; no paid trial path required).  
+- **Prisma:** `provider = "mysql"` + `DATABASE_URL` from the TiDB console (use the SSL params they show).  
+- **Dev:** local MySQL **or** the same TiDB cluster URL.  
+- **Render API:** set `DATABASE_URL` to the TiDB connection string.  
 
-1. **Stay on MySQL for learning continuity**  
-   - Dev: local MySQL  
-   - Prod: **TiDB Serverless** (or Aiven if you take a trial)  
-   - Express + Prisma `provider = "mysql"`  
-
-2. **Use Neon Postgres for deploy ease (recommended if hosting friction matters)**  
-   - Same Express code, same Prisma models (swap `provider` + connection string)  
-   - Neon ≈ Atlas for SQL  
-   - You are **not** learning a new backend - still Express; SQL skills transfer  
+**Skipped:** Neon Postgres (Postgres-only; not needed now). Aiven / RDS trials. Hobby free MySQL hosts.
 
 **Not recommended:** MongoDB - wrong data model for users ↔ ratings ↔ songs ↔ artists with averages and FKs.
-
-**Action:** Confirm **(1) MySQL + TiDB/Aiven** or **(2) Neon Postgres** before Phase 1 migrations.
 
 ### Monorepo layout (target)
 
@@ -119,7 +113,7 @@ cadence/
 └── README.md
 ```
 
-*(Alternative: `/client` + `/server` - same stack.)*
+**Locked layout:** monorepo with `apps/web` + `apps/api` (not `/client` + `/server`).
 
 ### 2.2 Linting, formatting & pre-commit (project-wide)
 
@@ -132,7 +126,7 @@ Use ESLint (flat config) with an import plugin (e.g. `eslint-plugin-import` and/
 **Required import groups** (blank line between groups), applied to **all** `apps/` and `packages/`:
 
 1. Node / built-ins (`node:`, `fs`, `path`, …)  
-2. External packages (`react`, `express`, `@tanstack/…`, …)  
+2. External packages (`react`, `express`, `axios`, …)  
 3. Internal / shared aliases (`@cadence/shared`, `@/…`)  
 4. Relative parent imports (`../…`)  
 5. Relative sibling / same-folder imports (`./…`)  
@@ -184,7 +178,7 @@ Install/setup in Phase 0: `husky`, `lint-staged`, `eslint`, Prettier, import-ord
 
 | Service | Role | Env |
 | ------- | ---- | --- |
-| **SQL host** (TiDB / Aiven / Neon) | Database | `DATABASE_URL` |
+| **TiDB Cloud Starter** | MySQL-compatible database | `DATABASE_URL` |
 | **Render** | Express API | `DATABASE_URL`, `JWT_SECRET`, `IMAGEKIT_*`, `CORS_ORIGIN`, `NODE_ENV`, `PORT` |
 | **Vercel** | Frontend | `VITE_API_URL` |
 | **ImageKit** | Covers | Public key + URL endpoint (FE); **private key only on API** |
@@ -213,7 +207,7 @@ Workflow `.github/workflows/telegram-notify.yml`:
 | Tool | Purpose |
 | ---- | ------- |
 | GitHub / `gh` | PRs, Actions |
-| DB dashboard (TiDB / Aiven / Neon) | Schema & SQL |
+| TiDB Cloud console | Schema & SQL |
 | Vercel MCP / CLI | Frontend deploy |
 | Render dashboard | API service + env |
 | ImageKit dashboard | Keys, folders |
@@ -229,11 +223,11 @@ Workflow `.github/workflows/telegram-notify.yml`:
 
 **4.1 Pre-start checklist**
 
-- [ ] **4.1.1** `AGENTS.md` + Cursor rules  
+- [x] **4.1.1** `AGENTS.md` + Cursor rules (`.cursor/rules/`)  
 - [ ] **4.1.2** Auth MCPs / CLIs as needed  
-- [ ] **4.1.3** Create **Cadence** projects: ImageKit, Render, Vercel, SQL host  
-- [ ] **4.1.4** Decide monorepo vs client/server  
-- [ ] **4.1.5** Lock DB choice: MySQL host **or** Neon  
+- [~] **4.1.3** Cloud projects: **TiDB Cloud Starter** done (+ `apps/api/.env`); **ImageKit / Render / Vercel** deferred until deploy-ready  
+- [x] **4.1.4** Layout: **monorepo** - `apps/web` + `apps/api`  
+- [x] **4.1.5** Lock DB choice: **MySQL + TiDB Cloud Starter**  
 
 ---
 
@@ -297,7 +291,8 @@ ratings        (id, user_id, song_id, value 1..5, UNIQUE(user_id, song_id), FKs)
 
 - Dark + light on every page  
 - Toasts + descriptive errors  
-- Loading / empty / error states  
+- **Skeleton loaders** while fetching (lists, cards, Home Top 10s, auth bootstrap) - **no circular spinners**  
+- Empty / error states  
 - Responsive + basic a11y  
 
 ### D. Stretch
@@ -374,8 +369,8 @@ Vercel production deploy success → Telegram. Secrets: `TELEGRAM_BOT_TOKEN`, `T
 ### Phase 0 - Prep
 
 1. Brand everything **Cadence**  
-2. Confirm DB host (TiDB/Aiven MySQL **or** Neon)  
-3. Create Render + Vercel + ImageKit + DB projects  
+2. DB host locked: **MySQL + TiDB Cloud Starter** - create the Starter cluster + copy `DATABASE_URL`  
+3. Create Render + Vercel + ImageKit projects (+ wire TiDB URL into Render)  
 4. `AGENTS.md` + Cursor rules  
 5. Scaffold Vite/React **TypeScript** + Express **TypeScript** + Prisma (`strict: true` in both `tsconfig`s)  
 6. **Lint/format toolchain (project-wide):** ESLint flat config with **import order + grouping**, Prettier root config + `eslint-config-prettier`, root scripts `lint` / `format` / `format:check`  
@@ -446,12 +441,12 @@ Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2**
 ### 14.1 Pre-start
 
 - [x] **14.1.1** Project name: **Cadence**  
-- [ ] **14.1.2** Confirm SQL host: MySQL (TiDB/Aiven) **or** Neon Postgres  
-- [ ] **14.1.3** Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render  
+- [x] **14.1.2** Confirm SQL host: **MySQL + TiDB Cloud Starter**  
+- [x] **14.1.3** Stack confirmed: **TypeScript (strict)** on web + API, Vite+React, Express, Prisma, ImageKit, Vercel, Render; monorepo `apps/web` + `apps/api`  
 - [ ] **14.1.4** ESLint import order/grouping + Prettier project-wide  
 - [ ] **14.1.5** Husky pre-commit → lint-staged (auto-fix staged files)  
-- [ ] **14.1.6** `AGENTS.md` + rules  
-- [ ] **14.1.7** Cloud projects + GitHub secrets placeholders  
+- [x] **14.1.6** `AGENTS.md` + Cursor rules  
+- [~] **14.1.7** Cloud projects + GitHub secrets: TiDB done; ImageKit / Render / Vercel / secrets when deploy-ready  
 
 ### 14.2 Product
 
@@ -493,8 +488,8 @@ Use IDs when talking to the AI (e.g. “do **14.2.3**” or “why is **14.1.2**
 
 ## 16. Immediate next step
 
-1. **You:** Choose DB path - **MySQL via TiDB/Aiven** or **Neon Postgres** (Express either way).  
-2. **Then:** Phase 0 scaffold for **Cadence**.  
+1. **Done / deferred:** TiDB + `DATABASE_URL` ready; ImageKit / Render / Vercel when deploy-ready.  
+2. **Next:** Phase 0 scaffold (`apps/web` + `apps/api`, Prisma `mysql`).  
 3. **At the end:** ERD + database schema + architecture docs + full README update (§13).
 
 ---

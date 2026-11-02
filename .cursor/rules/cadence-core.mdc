@@ -1,0 +1,16 @@
+---
+description: Cadence core stack, secrets, and agent workflow
+alwaysApply: true
+---
+
+# Cadence core
+
+- Read `AGENTS.md` and `plan.md` first. Honor checklist IDs (e.g. **14.2.3**).
+- Locked: monorepo `apps/web` + `apps/api`; TypeScript strict; Express + Prisma MySQL (TiDB); Vite React; ImageKit; Vercel + Render.
+- Do not introduce TanStack Query, Next.js, Nest, Fastify, MongoDB, or Railway unless the user asks. Use Axios for HTTP.
+- New app code goes in `apps/` (or `packages/`). Do not grow the legacy CRA / `songs-db` stack.
+- Never commit `.env` or secrets. ImageKit private key and `JWT_SECRET` stay on the API only.
+- No em dashes (`-`); use hyphens (`-`).
+- Keep diffs focused; no unsolicited drive-by refactors or extra markdown docs.
+- Prefer lint-staged / ESLint fixes over `--no-verify`.
+- Loading UI: skeleton loaders only - no circular spinners when fetching data.

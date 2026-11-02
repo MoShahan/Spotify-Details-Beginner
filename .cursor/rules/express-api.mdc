@@ -1,0 +1,20 @@
+---
+description: Express API conventions for apps/api
+globs: apps/api/**/*.{ts,tsx,js}
+alwaysApply: false
+---
+
+# Express API (`apps/api`)
+
+- Use Express + TypeScript only (no Nest/Fastify).
+- Structure: routers + middleware + services; keep `index`/`app` thin.
+- Validate bodies/params/queries with Zod; return a consistent JSON error shape.
+- Auth: JWT + bcrypt; protect mutating catalog routes.
+- Use Prisma for DB access; no raw ad-hoc SQL unless justified.
+- ImageKit: signed upload auth on the API; never expose `IMAGEKIT_PRIVATE_KEY`.
+- Env via `process.env` / dotenv from `apps/api/.env` (`DATABASE_URL`, `JWT_SECRET`, ImageKit, `CORS_ORIGIN`, `PORT`).
+
+```typescript
+// ✅ Consistent error response
+res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: '...' } });
+```

@@ -1,1 +1,77 @@
-node_modules
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+apps/api/.env
+apps/web/.env
+*.pem
+
+# Builds & outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.turbo/
+.cache/
+*.tsbuildinfo
+
+# Prisma
+**/prisma/generated/
+apps/api/prisma/generated/
+
+# Logs & debug
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Test / coverage
+coverage/
+.nyc_output/
+*.lcov
+playwright-report/
+test-results/
+.vitest/
+
+# OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors / IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# Optional tooling caches
+.eslintcache
+.stylelintcache
+.prettiercache
+*.pid
+*.seed
+*.pid.lock
+
+# Misc
+*.local
+.tmp/
+.temp/
+.vercel/
+.render/

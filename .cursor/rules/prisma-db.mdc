@@ -1,0 +1,14 @@
+---
+description: Prisma and MySQL (TiDB) schema conventions
+globs: "**/*.prisma,apps/api/prisma/**/*"
+alwaysApply: false
+---
+
+# Prisma / MySQL (TiDB)
+
+- `provider = "mysql"`. Connection from `DATABASE_URL` (TiDB; keep `sslaccept=strict`).
+- Normalized models only: `User`, `Artist`, `Song`, `SongArtist`, `Rating`.
+- Ratings: per-user 1–5 with `@@unique([userId, songId])`. No rating column on `Song`.
+- Song↔Artist is M2M via join table - not CSV strings.
+- Ship migrations + seed in-repo. Document average-rating rules in README/schema docs.
+- Prefer Prisma Client over raw SQL; if raw SQL is required, keep it in one place and typed.
