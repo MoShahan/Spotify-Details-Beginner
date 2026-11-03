@@ -174,6 +174,9 @@ Optional: GitHub secrets `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` for [deploy n
 
 ## Coming soon
 
+- Playlists - create your own playlists and add songs to them
+- Reset / forgot password - request a reset and choose a new password
+- Song links - YouTube, Deezer, and Spotify links on each song
 - Lyrics on song detail (placeholder live)
 - Search on Home
 - Flexible artist identity (e.g. name + DOB + nationality)
