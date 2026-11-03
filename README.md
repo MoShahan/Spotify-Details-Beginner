@@ -36,8 +36,6 @@ Personal full-stack **music catalog** - rate songs, rank artists, add covers. Po
 
 ![New artist](docs/assets/screenshot-new-artist.png)
 
-> If images are missing locally, pull latest or re-capture from the live site after login.
-
 ## Features
 
 - **Auth** - Register and login (name + email); JWT sessions; protected catalog routes
