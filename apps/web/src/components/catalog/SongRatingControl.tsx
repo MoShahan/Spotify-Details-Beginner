@@ -51,7 +51,7 @@ export function SongRatingControl({
       <label className="flex flex-col gap-0.5">
         <span className="sr-only">Rate song</span>
         <select
-          className="h-9 rounded-[var(--cadence-radius)] border border-[var(--cadence-border)] bg-[var(--cadence-surface)] px-2 text-sm text-[var(--cadence-fg)] shadow-[var(--cadence-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)] disabled:opacity-50"
+          className="cadence-field h-9 px-2 text-sm text-[var(--cadence-fg)] focus-visible:outline-none disabled:opacity-50"
           value={value}
           disabled={busy}
           aria-label="Rate from 1 to 5"

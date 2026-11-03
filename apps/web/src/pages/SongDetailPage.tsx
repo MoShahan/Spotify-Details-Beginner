@@ -77,10 +77,16 @@ export function SongDetailPage() {
 
   if (state.status === 'loading') {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-48 w-full max-w-sm" />
-        <Skeleton className="h-4 w-64" />
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-4 w-28" />
+        <div className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr]">
+          <Skeleton className="aspect-square w-full max-w-[18rem]" />
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-10 w-56" />
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -106,16 +112,14 @@ export function SongDetailPage() {
 
   return (
     <section className="flex flex-col gap-8">
-      <div>
-        <Link
-          to="/songs"
-          className="text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
-        >
-          Back to songs
-        </Link>
-      </div>
+      <Link
+        to="/songs"
+        className="w-fit text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
+      >
+        Back to songs
+      </Link>
 
-      <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
+      <div className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr]">
         <CatalogImageEditor
           label="Cover"
           alt={`${song.name} cover`}
@@ -125,11 +129,11 @@ export function SongDetailPage() {
           onSave={saveCover}
         />
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
             {song.name}
           </h1>
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
+          <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-[var(--cadence-fg-muted)]">Artists</dt>
               <dd className="mt-1 font-medium">
@@ -158,8 +162,8 @@ export function SongDetailPage() {
             </div>
           </dl>
 
-          <div className="cadence-panel flex flex-col gap-3 p-4">
-            <h2 className="text-sm font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase">
+          <div className="flex flex-col gap-2 border-t border-[var(--cadence-border)] pt-4">
+            <h2 className="text-sm font-medium text-[var(--cadence-fg-muted)]">
               Your rating
             </h2>
             {showRatingEditor ? (
@@ -192,23 +196,12 @@ export function SongDetailPage() {
               </div>
             )}
           </div>
+
+          <p className="text-sm text-[var(--cadence-fg-muted)]">
+            Lyrics - coming soon
+          </p>
         </div>
       </div>
-
-      <section
-        className="cadence-panel p-4 sm:p-5"
-        aria-labelledby="song-lyrics-heading"
-      >
-        <h2
-          id="song-lyrics-heading"
-          className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight"
-        >
-          Lyrics
-        </h2>
-        <p className="mt-2 text-sm text-[var(--cadence-fg-muted)]">
-          Coming soon
-        </p>
-      </section>
     </section>
   );
 }

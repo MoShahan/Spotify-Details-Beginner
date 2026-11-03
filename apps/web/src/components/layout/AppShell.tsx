@@ -1,6 +1,6 @@
 import { Disc3, Home, Info, LogOut, Menu, Users, X } from 'lucide-react';
 import { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../../contexts/auth';
 import { cn } from '../../lib/utils';
@@ -9,10 +9,10 @@ import { ThemeToggle } from './ThemeToggle';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
-    'flex items-center gap-2.5 rounded-[var(--cadence-radius)] px-3 py-2 text-sm font-medium transition-colors',
+    'relative flex items-center gap-2.5 rounded-[var(--cadence-radius)] px-3 py-2 text-sm font-medium transition-colors',
     isActive
-      ? 'bg-[var(--cadence-muted)] text-[var(--cadence-fg)] shadow-[var(--cadence-shadow-sm)]'
-      : 'text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)]/70 hover:text-[var(--cadence-fg)]',
+      ? 'bg-[var(--cadence-muted)]/80 text-[var(--cadence-fg)] before:absolute before:top-1/2 before:left-0 before:h-5 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-[var(--cadence-accent)]'
+      : 'text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)]/60 hover:text-[var(--cadence-fg)]',
   );
 
 function SidebarBrand({ onNavigate }: { onNavigate?: () => void }) {
@@ -20,10 +20,10 @@ function SidebarBrand({ onNavigate }: { onNavigate?: () => void }) {
     <Link
       to="/"
       onClick={onNavigate}
-      className="mx-3 mt-4 mb-2 flex items-center gap-2.5 rounded-[var(--cadence-radius)] px-3 py-3 font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]/70"
+      className="mx-3 mt-4 mb-2 flex items-center gap-2.5 rounded-[var(--cadence-radius)] px-3 py-3 font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]/60"
     >
       <img
-        src="/favicon.svg"
+        src="/logo-mark.svg"
         alt=""
         width={28}
         height={28}
@@ -77,10 +77,10 @@ function SidebarAccount({
 }) {
   return (
     <div className="mt-auto px-3 pt-4 pb-3">
-      <div className="overflow-hidden rounded-[var(--cadence-radius)] border border-[var(--cadence-border)] bg-[var(--cadence-muted)]/35 shadow-[var(--cadence-shadow-sm)]">
+      <div className="overflow-hidden rounded-[var(--cadence-radius)] border border-[var(--cadence-border)] bg-[var(--cadence-surface)]">
         <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
           <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-[calc(var(--cadence-radius)-1px)] bg-[var(--cadence-accent)] font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--cadence-accent-fg)] shadow-[var(--cadence-shadow-sm)]"
+            className="flex size-9 shrink-0 items-center justify-center rounded-[calc(var(--cadence-radius)-1px)] bg-[var(--cadence-muted)] font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--cadence-accent)]"
             aria-hidden
           >
             {getInitials(name)}
@@ -103,13 +103,22 @@ function SidebarAccount({
           <button
             type="button"
             onClick={onLogout}
-            className="flex w-full items-center gap-2 rounded-[calc(var(--cadence-radius)-2px)] px-2.5 py-2 text-sm font-medium text-[var(--cadence-fg-muted)] transition-colors hover:bg-[var(--cadence-surface)] hover:text-[var(--cadence-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)]"
+            className="flex w-full items-center gap-2 rounded-[calc(var(--cadence-radius)-2px)] px-2.5 py-2 text-sm font-medium text-[var(--cadence-fg-muted)] transition-colors hover:bg-[var(--cadence-muted)]/70 hover:text-[var(--cadence-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cadence-ring)]"
           >
             <LogOut className="size-4 shrink-0" aria-hidden />
             Log out
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function AnimatedOutlet() {
+  const location = useLocation();
+  return (
+    <div key={location.pathname} className="cadence-page-enter">
+      <Outlet />
     </div>
   );
 }
@@ -124,15 +133,39 @@ export function AppShell() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen flex-col bg-[var(--cadence-bg)] text-[var(--cadence-fg)]">
-        <header className="sticky top-0 z-20 border-b border-[var(--cadence-border)] bg-[var(--cadence-surface)]/85 shadow-[var(--cadence-shadow-sm)] backdrop-blur-md">
-          <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
+      <div className="relative flex min-h-screen flex-col text-[var(--cadence-fg)]">
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          aria-hidden
+        >
+          <img
+            src="/images/auth-bg-vinyl.jpg"
+            alt=""
+            className="absolute inset-0 size-full object-cover object-center opacity-45 dark:opacity-35"
+          />
+          <img
+            src="/images/auth-bg-covers.jpg"
+            alt=""
+            className="absolute -right-[8%] bottom-[-12%] hidden h-[58%] w-auto max-w-none rotate-3 object-cover opacity-30 blur-[1px] sm:block dark:opacity-25"
+          />
+          <div className="absolute inset-0 bg-[var(--cadence-bg)]/72 dark:bg-[var(--cadence-bg)]/78" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(900px 480px at 12% -8%, color-mix(in srgb, var(--cadence-accent) 10%, transparent), transparent 55%)',
+            }}
+          />
+        </div>
+
+        <header className="sticky top-0 z-20 border-b border-[var(--cadence-border)] bg-[var(--cadence-surface)]/75 backdrop-blur-md">
+          <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-8">
             <Link
               to="/login"
               className="flex items-center gap-2 font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight"
             >
               <img
-                src="/favicon.svg"
+                src="/logo-mark.svg"
                 alt=""
                 width={28}
                 height={28}
@@ -140,31 +173,33 @@ export function AppShell() {
               />
               <span>Cadence</span>
             </Link>
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Link
-                to="/about"
-                className="inline-flex h-9 items-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)] hover:text-[var(--cadence-fg)]"
-              >
-                About
-              </Link>
-              <Link
-                to="/login"
-                className="inline-flex h-9 items-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/register"
-                className="inline-flex h-9 items-center rounded-[var(--cadence-radius)] bg-[var(--cadence-accent)] px-3 text-sm font-medium text-[var(--cadence-accent-fg)] shadow-[var(--cadence-shadow-sm)] hover:opacity-90"
-              >
-                Sign up
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/about"
+                  className="inline-flex h-9 items-center justify-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg-muted)] hover:bg-[var(--cadence-muted)] hover:text-[var(--cadence-fg)]"
+                >
+                  About
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex h-9 items-center justify-center rounded-[var(--cadence-radius)] px-3 text-sm font-medium text-[var(--cadence-fg)] hover:bg-[var(--cadence-muted)]"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex h-9 items-center justify-center rounded-[var(--cadence-radius)] bg-[var(--cadence-accent)] px-3 text-sm font-medium text-[var(--cadence-accent-fg)] hover:opacity-90"
+                >
+                  Sign up
+                </Link>
+              </div>
             </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-          <Outlet />
+        <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8 sm:py-10">
+          <AnimatedOutlet />
         </main>
       </div>
     );
@@ -173,24 +208,46 @@ export function AppShell() {
   const displayName = user?.name ?? 'Account';
 
   return (
-    <div className="flex min-h-screen bg-[var(--cadence-bg)] text-[var(--cadence-fg)]">
-      {/* Desktop sidebar - brand + nav + account; no top header needed */}
-      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-[var(--cadence-border)] bg-[var(--cadence-surface)]/95 shadow-[var(--cadence-shadow-sm)] backdrop-blur-sm md:flex">
+    <div className="relative flex min-h-screen text-[var(--cadence-fg)]">
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden
+      >
+        <img
+          src="/images/auth-bg-covers.jpg"
+          alt=""
+          className="absolute inset-0 size-full object-cover object-[center_30%] opacity-30 dark:opacity-22"
+        />
+        <img
+          src="/images/auth-bg-vinyl.jpg"
+          alt=""
+          className="absolute -left-[12%] top-[-18%] hidden h-[70%] w-auto max-w-none -rotate-2 object-cover opacity-20 blur-[1.5px] lg:block dark:opacity-15"
+        />
+        <div className="absolute inset-0 bg-[var(--cadence-bg)]/82 dark:bg-[var(--cadence-bg)]/86" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(800px 420px at 85% 0%, color-mix(in srgb, var(--cadence-accent) 8%, transparent), transparent 55%)',
+          }}
+        />
+      </div>
+
+      <aside className="sticky top-0 z-20 hidden h-screen w-56 shrink-0 flex-col border-r border-[var(--cadence-border)] bg-[var(--cadence-surface)]/92 backdrop-blur-sm md:flex">
         <SidebarBrand />
         <SidebarNav />
         <SidebarAccount name={displayName} onLogout={logout} />
       </aside>
 
-      {/* Mobile drawer */}
       {mobileOpen ? (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="cadence-drawer-backdrop fixed inset-0 z-40 md:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"
             aria-label="Close menu"
             onClick={closeMobile}
           />
-          <aside className="relative flex h-full w-56 flex-col border-r border-[var(--cadence-border)] bg-[var(--cadence-surface)] shadow-[var(--cadence-shadow)]">
+          <aside className="cadence-drawer-panel relative flex h-full w-56 flex-col border-r border-[var(--cadence-border)] bg-[var(--cadence-surface)] shadow-[var(--cadence-shadow)]">
             <div className="relative">
               <Button
                 type="button"
@@ -216,9 +273,8 @@ export function AppShell() {
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Mobile only: open the sidebar drawer. Desktop has no header. */}
-        <header className="sticky top-0 z-20 border-b border-[var(--cadence-border)] bg-[var(--cadence-surface)]/85 shadow-[var(--cadence-shadow-sm)] backdrop-blur-md md:hidden">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 border-b border-[var(--cadence-border)] bg-[var(--cadence-surface)]/80 backdrop-blur-md md:hidden">
           <div className="flex h-14 items-center gap-2 px-4">
             <Button
               type="button"
@@ -238,8 +294,8 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-          <Outlet />
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8 sm:py-10">
+          <AnimatedOutlet />
         </main>
       </div>
     </div>

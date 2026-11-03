@@ -117,7 +117,11 @@ export function CatalogImageEditor({
     <>
       <div className="cadence-panel group relative aspect-square overflow-hidden">
         {currentUrl ? (
-          <img src={currentUrl} alt={alt} className="size-full object-cover" />
+          <img
+            src={currentUrl}
+            alt={alt}
+            className="cadence-cover-settle size-full object-cover"
+          />
         ) : (
           <div className="flex size-full items-center justify-center text-sm text-[var(--cadence-fg-muted)]">
             {emptyLabel}

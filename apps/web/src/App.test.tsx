@@ -21,7 +21,9 @@ describe('App shell', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText('Cadence')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Log in' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Log in' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Cadence').length).toBeGreaterThan(0);
   });
 });

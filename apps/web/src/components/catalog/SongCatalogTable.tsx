@@ -37,7 +37,7 @@ export function SongCatalogTable({
           <tr>
             <th
               scope="col"
-              className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+              className="w-16 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)]"
             >
               <span className="sr-only">Cover</span>
             </th>
@@ -50,7 +50,7 @@ export function SongCatalogTable({
             />
             <th
               scope="col"
-              className="border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+              className="border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)]"
             >
               Artists
             </th>
@@ -108,13 +108,14 @@ export function SongCatalogTable({
             ? songs.map((song) => (
                 <tr
                   key={song.id}
-                  className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
+                  className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/20 hover:bg-[var(--cadence-muted)]/45"
                 >
-                  <td className="border-b border-[var(--cadence-border)] px-3 py-2">
+                  <td className="border-b border-[var(--cadence-border)] px-3 py-2.5">
                     <Link to={`/songs/${song.id}`} tabIndex={-1}>
                       <CatalogThumb
                         src={song.coverUrl}
                         alt={`${song.name} cover`}
+                        size="sm"
                       />
                     </Link>
                   </td>

@@ -7,20 +7,21 @@
   --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
 
-  --cadence-bg: #e6ede3;
-  --cadence-surface: #fbfcf9;
-  --cadence-fg: #121812;
-  --cadence-fg-muted: #5a6558;
-  --cadence-muted: #e0e7dc;
-  --cadence-border: color-mix(in srgb, #1a2418 12%, transparent);
-  --cadence-accent: #c8f135;
-  --cadence-accent-fg: #152010;
-  --cadence-ring: color-mix(in srgb, #8aa61f 55%, transparent);
-  --cadence-radius: 0.5rem;
+  --cadence-bg: #f4f3f0;
+  --cadence-surface: #fffcfa;
+  --cadence-fg: #161616;
+  --cadence-fg-muted: #6a6964;
+  --cadence-muted: #ebe9e4;
+  --cadence-border: color-mix(in srgb, #161616 10%, transparent);
+  --cadence-accent: #2f6a66;
+  --cadence-accent-fg: #ffffff;
+  --cadence-ring: color-mix(in srgb, #2f6a66 40%, transparent);
+  --cadence-destructive: #b42318;
+  --cadence-radius: 0.625rem;
   --cadence-shadow:
-    0 1px 2px color-mix(in srgb, #10140f 6%, transparent),
-    0 4px 14px color-mix(in srgb, #10140f 5%, transparent);
-  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #10140f 5%, transparent);
+    0 1px 2px color-mix(in srgb, #161616 4%, transparent),
+    0 4px 12px color-mix(in srgb, #161616 4%, transparent);
+  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #161616 4%, transparent);
 
   font-family: var(--font-body);
   line-height: 1.5;
@@ -31,19 +32,20 @@
 
 .dark {
   color-scheme: dark;
-  --cadence-bg: #0e120d;
-  --cadence-surface: #171d15;
-  --cadence-fg: #eef3ea;
-  --cadence-fg-muted: #9aa894;
-  --cadence-muted: #252d23;
-  --cadence-border: color-mix(in srgb, #eef3ea 12%, transparent);
-  --cadence-accent: #c8f135;
-  --cadence-accent-fg: #152010;
-  --cadence-ring: color-mix(in srgb, #c8f135 45%, transparent);
+  --cadence-bg: #111111;
+  --cadence-surface: #1a1a1a;
+  --cadence-fg: #f2f2f0;
+  --cadence-fg-muted: #9a9a94;
+  --cadence-muted: #262626;
+  --cadence-border: color-mix(in srgb, #f2f2f0 10%, transparent);
+  --cadence-accent: #6eb4ae;
+  --cadence-accent-fg: #0f1a19;
+  --cadence-ring: color-mix(in srgb, #6eb4ae 40%, transparent);
+  --cadence-destructive: #f97066;
   --cadence-shadow:
-    0 1px 2px color-mix(in srgb, #000 45%, transparent),
-    0 8px 24px color-mix(in srgb, #000 35%, transparent);
-  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #000 40%, transparent);
+    0 1px 2px color-mix(in srgb, #000 40%, transparent),
+    0 8px 20px color-mix(in srgb, #000 28%, transparent);
+  --cadence-shadow-sm: 0 1px 2px color-mix(in srgb, #000 35%, transparent);
 }
 
 * {
@@ -56,13 +58,13 @@ body {
   min-height: 100vh;
   background:
     radial-gradient(
-      1200px 600px at 10% -10%,
-      color-mix(in srgb, var(--cadence-accent) 10%, transparent),
+      1100px 520px at 8% -8%,
+      color-mix(in srgb, var(--cadence-accent) 8%, transparent),
       transparent 55%
     ),
     radial-gradient(
-      900px 500px at 100% 0%,
-      color-mix(in srgb, var(--cadence-muted) 55%, transparent),
+      900px 480px at 100% 0%,
+      color-mix(in srgb, var(--cadence-muted) 45%, transparent),
       transparent 50%
     ),
     var(--cadence-bg);
@@ -77,30 +79,93 @@ body {
   border: 1px solid var(--cadence-border);
   border-radius: var(--cadence-radius);
   background: var(--cadence-surface);
-  box-shadow: var(--cadence-shadow);
+  box-shadow: var(--cadence-shadow-sm);
 }
 
 .cadence-field {
   border: 1px solid var(--cadence-border);
   border-radius: var(--cadence-radius);
   background: var(--cadence-surface);
-  box-shadow: var(--cadence-shadow-sm);
+  box-shadow: none;
   transition:
     border-color 150ms ease,
     box-shadow 150ms ease;
 }
 
 .cadence-field:hover:not(:disabled):not(:focus-visible) {
-  border-color: color-mix(in srgb, var(--cadence-fg) 22%, transparent);
+  border-color: color-mix(in srgb, var(--cadence-fg) 20%, transparent);
 }
 
 .cadence-field:focus-visible {
   border-color: color-mix(
     in srgb,
-    var(--cadence-accent) 70%,
+    var(--cadence-accent) 65%,
     var(--cadence-border)
   );
-  box-shadow:
-    var(--cadence-shadow-sm),
-    0 0 0 3px var(--cadence-ring);
+  box-shadow: 0 0 0 3px var(--cadence-ring);
+}
+
+.cadence-page-enter {
+  animation: cadence-page-in 180ms ease-out;
+}
+
+.cadence-drawer-backdrop {
+  animation: cadence-fade-in 160ms ease-out;
+}
+
+.cadence-drawer-panel {
+  animation: cadence-slide-in 180ms ease-out;
+}
+
+.cadence-cover-settle {
+  animation: cadence-cover-in 220ms ease-out;
+}
+
+@keyframes cadence-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cadence-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cadence-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cadence-cover-in {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cadence-page-enter,
+  .cadence-drawer-backdrop,
+  .cadence-drawer-panel,
+  .cadence-cover-settle {
+    animation: none;
+  }
 }

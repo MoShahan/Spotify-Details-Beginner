@@ -6,6 +6,7 @@ import { CatalogSearch } from '../components/catalog/CatalogSearch';
 import { CatalogThumb } from '../components/catalog/CatalogThumb';
 import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
+import { PageHeader } from '../components/layout/PageHeader';
 import { buttonVariants } from '../components/ui/button';
 import { useDebouncedCatalogQuery } from '../hooks/useDebouncedCatalogQuery';
 import { api } from '../lib/api';
@@ -46,23 +47,16 @@ export function ArtistsPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
-            Artists
-          </h1>
-          <p className="text-sm text-[var(--cadence-fg-muted)]">
-            Browse artists. Search, then click a column header to sort.
-          </p>
-        </div>
-        <Link
-          to="/artists/new"
-          className={cn(buttonVariants(), 'shrink-0 self-start sm:self-auto')}
-        >
-          <Plus className="size-4" aria-hidden />
-          New artist
-        </Link>
-      </div>
+      <PageHeader
+        title="Artists"
+        subtitle="Browse artists. Search, then click a column header to sort."
+        actions={
+          <Link to="/artists/new" className={cn(buttonVariants())}>
+            <Plus className="size-4" aria-hidden />
+            New artist
+          </Link>
+        }
+      />
 
       <CatalogSearch
         search={search}
@@ -76,7 +70,7 @@ export function ArtistsPage() {
             <tr>
               <th
                 scope="col"
-                className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+                className="w-16 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)]"
               >
                 <span className="sr-only">Image</span>
               </th>
@@ -96,7 +90,7 @@ export function ArtistsPage() {
               />
               <th
                 scope="col"
-                className="border-b border-[var(--cadence-border)] px-3 py-3 text-right text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
+                className="border-b border-[var(--cadence-border)] px-3 py-3 text-right text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)]"
               >
                 Ratings
               </th>
@@ -142,11 +136,15 @@ export function ArtistsPage() {
               ? state.data.map((artist) => (
                   <tr
                     key={artist.id}
-                    className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
+                    className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/20 hover:bg-[var(--cadence-muted)]/45"
                   >
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-2">
+                    <td className="border-b border-[var(--cadence-border)] px-3 py-2.5">
                       <Link to={`/artists/${artist.id}`} tabIndex={-1}>
-                        <CatalogThumb src={artist.imageUrl} alt={artist.name} />
+                        <CatalogThumb
+                          src={artist.imageUrl}
+                          alt={artist.name}
+                          size="sm"
+                        />
                       </Link>
                     </td>
                     <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">

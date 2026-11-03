@@ -34,7 +34,7 @@ export function SortableTh<T extends string>({
       scope="col"
       aria-sort={ariaSort}
       className={cn(
-        'border-b border-[var(--cadence-border)] px-3 py-3 text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase',
+        'border-b border-[var(--cadence-border)] px-3 py-3 text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)]',
         align === 'right' ? 'text-right' : 'text-left',
         className,
       )}

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { ArtistLinkList } from '../components/catalog/ArtistLinkList';
+import { RankRow } from '../components/home/RankRow';
 import { TopListsSkeleton } from '../components/home/TopListsSkeleton';
+import { PageHeader } from '../components/layout/PageHeader';
 import { useAuth } from '../contexts/auth';
 import { api, getApiErrorMessage } from '../lib/api';
 import { formatRating, type TopArtist, type TopSong } from '../lib/catalog';
@@ -52,14 +53,10 @@ export function HomePage() {
 
   return (
     <section className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
-          Home
-        </h1>
-        <p className="max-w-xl text-[var(--cadence-fg-muted)]">
-          Welcome{user ? `, ${user.name}` : ''}. Top 10 by average rating.
-        </p>
-      </div>
+      <PageHeader
+        title="Home"
+        subtitle={`Welcome${user ? `, ${user.name}` : ''}. Top 10 by average rating.`}
+      />
 
       {state.status === 'loading' ? <TopListsSkeleton /> : null}
 
@@ -73,7 +70,7 @@ export function HomePage() {
       ) : null}
 
       {state.status === 'ready' ? (
-        <div className="grid gap-10 lg:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
           <TopSongsList songs={state.songs} />
           <TopArtistsList artists={state.artists} />
         </div>
@@ -84,90 +81,69 @@ export function HomePage() {
 
 function TopSongsList({ songs }: { songs: TopSong[] }) {
   return (
-    <div className="cadence-panel flex flex-col gap-4 p-4 sm:p-5">
-      <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
+    <div className="flex flex-col gap-3">
+      <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--cadence-fg-muted)]">
         Top 10 Songs
       </h2>
-      {songs.length === 0 ? (
-        <p className="text-sm text-[var(--cadence-fg-muted)]">No songs yet.</p>
-      ) : (
-        <ol className="flex flex-col">
-          {songs.map((song, index) => (
-            <li
-              key={song.id}
-              className="flex items-start gap-3 border-b border-[var(--cadence-border)] py-3 last:border-b-0"
-            >
-              <span className="w-6 shrink-0 text-sm font-medium text-[var(--cadence-fg-muted)]">
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-[var(--cadence-fg)]">
-                  <Link
-                    to={`/songs/${song.id}`}
-                    className="underline-offset-4 hover:underline"
-                  >
-                    {song.name}
-                  </Link>
-                </p>
-                <p className="truncate text-sm text-[var(--cadence-fg-muted)]">
+      <div className="cadence-panel px-3 py-2 sm:px-4">
+        {songs.length === 0 ? (
+          <p className="px-1 py-4 text-sm text-[var(--cadence-fg-muted)]">
+            No songs yet.
+          </p>
+        ) : (
+          <ol className="flex flex-col divide-y divide-[var(--cadence-border)]">
+            {songs.map((song, index) => (
+              <RankRow
+                key={song.id}
+                rank={index + 1}
+                to={`/songs/${song.id}`}
+                title={song.name}
+                meta={
                   <ArtistLinkList
                     artists={song.artists}
                     empty="Unknown artist"
                   />
-                </p>
-              </div>
-              <span className="shrink-0 text-sm font-medium tabular-nums text-[var(--cadence-fg)]">
-                {formatRating(song.averageRating)}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
+                }
+                rating={formatRating(song.averageRating)}
+                imageSrc={song.coverUrl}
+                imageAlt={`${song.name} cover`}
+              />
+            ))}
+          </ol>
+        )}
+      </div>
     </div>
   );
 }
 
 function TopArtistsList({ artists }: { artists: TopArtist[] }) {
   return (
-    <div className="cadence-panel flex flex-col gap-4 p-4 sm:p-5">
-      <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
+    <div className="flex flex-col gap-3">
+      <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--cadence-fg-muted)]">
         Top 10 Artists
       </h2>
-      {artists.length === 0 ? (
-        <p className="text-sm text-[var(--cadence-fg-muted)]">
-          No artists yet.
-        </p>
-      ) : (
-        <ol className="flex flex-col">
-          {artists.map((artist, index) => (
-            <li
-              key={artist.id}
-              className="flex items-start gap-3 border-b border-[var(--cadence-border)] py-3 last:border-b-0"
-            >
-              <span className="w-6 shrink-0 text-sm font-medium text-[var(--cadence-fg-muted)]">
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-[var(--cadence-fg)]">
-                  <Link
-                    to={`/artists/${artist.id}`}
-                    className="underline-offset-4 hover:underline"
-                  >
-                    {artist.name}
-                  </Link>
-                </p>
-                <p className="text-sm text-[var(--cadence-fg-muted)]">
-                  {artist.ratingCount}{' '}
-                  {artist.ratingCount === 1 ? 'rating' : 'ratings'}
-                </p>
-              </div>
-              <span className="shrink-0 text-sm font-medium tabular-nums text-[var(--cadence-fg)]">
-                {formatRating(artist.averageRating)}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
+      <div className="cadence-panel px-3 py-2 sm:px-4">
+        {artists.length === 0 ? (
+          <p className="px-1 py-4 text-sm text-[var(--cadence-fg-muted)]">
+            No artists yet.
+          </p>
+        ) : (
+          <ol className="flex flex-col divide-y divide-[var(--cadence-border)]">
+            {artists.map((artist, index) => (
+              <RankRow
+                key={artist.id}
+                rank={index + 1}
+                to={`/artists/${artist.id}`}
+                title={artist.name}
+                meta={`${artist.ratingCount} ${artist.ratingCount === 1 ? 'rating' : 'ratings'}`}
+                rating={formatRating(artist.averageRating)}
+                imageSrc={artist.imageUrl}
+                imageAlt={artist.name}
+              />
+            ))}
+          </ol>
+        )}
+      </div>
     </div>
   );
 }

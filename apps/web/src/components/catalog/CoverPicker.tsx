@@ -59,15 +59,15 @@ export function CoverPicker({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="cadence-panel aspect-square max-w-[12rem] overflow-hidden">
+      <div className="cadence-panel aspect-square w-full max-w-[18rem] overflow-hidden">
         {value ? (
           <img
             src={value}
             alt={previewAlt}
-            className="size-full object-cover"
+            className="cadence-cover-settle size-full object-cover"
           />
         ) : (
-          <div className="flex size-full items-center justify-center text-sm text-[var(--cadence-fg-muted)]">
+          <div className="flex size-full items-center justify-center bg-[var(--cadence-muted)]/50 text-sm text-[var(--cadence-fg-muted)]">
             {emptyLabel}
           </div>
         )}

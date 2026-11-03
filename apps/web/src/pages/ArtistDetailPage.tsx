@@ -174,10 +174,16 @@ export function ArtistDetailPage() {
 
   if (state.status === 'loading') {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-48 w-full max-w-sm" />
-        <Skeleton className="h-4 w-64" />
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-4 w-28" />
+        <div className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr]">
+          <Skeleton className="aspect-square w-full max-w-[18rem]" />
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-10 w-56" />
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -202,16 +208,14 @@ export function ArtistDetailPage() {
 
   return (
     <section className="flex flex-col gap-8">
-      <div>
-        <Link
-          to="/artists"
-          className="text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
-        >
-          Back to artists
-        </Link>
-      </div>
+      <Link
+        to="/artists"
+        className="w-fit text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
+      >
+        Back to artists
+      </Link>
 
-      <div className="grid gap-8 md:grid-cols-[minmax(0,16rem)_1fr]">
+      <div className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr]">
         <CatalogImageEditor
           label="Artist image"
           alt={artist.name}
@@ -221,11 +225,11 @@ export function ArtistDetailPage() {
           onSave={saveImage}
         />
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
             {artist.name}
           </h1>
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
+          <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-[var(--cadence-fg-muted)]">Date of birth</dt>
               <dd className="mt-1 font-medium tabular-nums">
@@ -252,7 +256,7 @@ export function ArtistDetailPage() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
+        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--cadence-fg-muted)]">
           Songs
         </h2>
         {artist.songs.length === 0 ? (

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { CoverPicker } from '../components/catalog/CoverPicker';
+import { PageHeader } from '../components/layout/PageHeader';
 import { Button, buttonVariants } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -109,23 +110,21 @@ export function NewSongPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div>
+      <div className="flex flex-col gap-3">
         <Link
           to="/songs"
-          className="text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
+          className="w-fit text-sm text-[var(--cadence-fg-muted)] underline underline-offset-4"
         >
           Back to songs
         </Link>
-        <h1 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
-          New song
-        </h1>
-        <p className="mt-2 max-w-xl text-sm text-[var(--cadence-fg-muted)]">
-          Add a catalog entry with artists and an optional cover.
-        </p>
+        <PageHeader
+          title="New song"
+          subtitle="Add a catalog entry with artists and an optional cover."
+        />
       </div>
 
       <form
-        className="grid gap-8 lg:grid-cols-[minmax(0,14rem)_1fr]"
+        className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr]"
         onSubmit={(event) => {
           void handleSubmit(onSubmit)(event);
         }}
@@ -146,7 +145,7 @@ export function NewSongPage() {
         />
 
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="song-name">Name</Label>
             <Input
               id="song-name"
@@ -154,14 +153,14 @@ export function NewSongPage() {
               {...register('name')}
             />
             {errors.name ? (
-              <p className="text-sm text-red-600 dark:text-red-400">
+              <p className="text-sm text-[var(--cadence-destructive)]">
                 {errors.name.message}
               </p>
             ) : null}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="song-release">Release date</Label>
               <Input
                 id="song-release"
@@ -170,16 +169,16 @@ export function NewSongPage() {
                 {...register('releaseDate')}
               />
               {errors.releaseDate ? (
-                <p className="text-sm text-red-600 dark:text-red-400">
+                <p className="text-sm text-[var(--cadence-destructive)]">
                   {errors.releaseDate.message}
                 </p>
               ) : null}
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="song-album">Album (optional)</Label>
               <Input id="song-album" {...register('album')} />
               {errors.album ? (
-                <p className="text-sm text-red-600 dark:text-red-400">
+                <p className="text-sm text-[var(--cadence-destructive)]">
                   {errors.album.message}
                 </p>
               ) : null}
@@ -209,7 +208,7 @@ export function NewSongPage() {
             />
 
             {artistsLoading ? (
-              <div className="cadence-panel space-y-2 p-3">
+              <div className="space-y-2 rounded-[var(--cadence-radius)] border border-[var(--cadence-border)] p-3">
                 <Skeleton className="h-5 w-40" />
                 <Skeleton className="h-5 w-52" />
                 <Skeleton className="h-5 w-36" />
@@ -226,13 +225,13 @@ export function NewSongPage() {
             ) : null}
 
             {!artistsLoading && !artistsError ? (
-              <div className="cadence-panel max-h-56 overflow-y-auto p-2">
+              <div className="max-h-56 overflow-y-auto rounded-[var(--cadence-radius)] border border-[var(--cadence-border)] p-2">
                 {filteredArtists.length === 0 ? (
                   <p className="px-2 py-3 text-sm text-[var(--cadence-fg-muted)]">
                     No artists match. Add one above.
                   </p>
                 ) : (
-                  <ul className="flex flex-col gap-1">
+                  <ul className="flex flex-col gap-0.5">
                     {filteredArtists.map((artist) => {
                       const checked = selectedIds.includes(artist.id);
                       return (
@@ -259,12 +258,12 @@ export function NewSongPage() {
             ) : null}
 
             {errors.artistIds ? (
-              <p className="text-sm text-red-600 dark:text-red-400">
+              <p className="text-sm text-[var(--cadence-destructive)]">
                 {errors.artistIds.message}
               </p>
             ) : null}
             {errors.coverUrl ? (
-              <p className="text-sm text-red-600 dark:text-red-400">
+              <p className="text-sm text-[var(--cadence-destructive)]">
                 {errors.coverUrl.message}
               </p>
             ) : null}

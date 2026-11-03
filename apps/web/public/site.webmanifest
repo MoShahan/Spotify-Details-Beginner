@@ -4,8 +4,8 @@
   "description": "Personal music catalog - rate songs, rank artists, add covers",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#e8efe6",
-  "theme_color": "#10140f",
+  "background_color": "#f4f3f0",
+  "theme_color": "#111111",
   "icons": [
     {
       "src": "/favicon.svg",

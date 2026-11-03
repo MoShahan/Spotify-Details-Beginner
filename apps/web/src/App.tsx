@@ -39,7 +39,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
-          <Toaster richColors position="top-center" closeButton />
+          <Toaster position="top-center" closeButton />
         </SessionGate>
       </AuthProvider>
     </ThemeProvider>

@@ -15,7 +15,7 @@ export function CatalogSearch({
   searchPlaceholder = 'Search...',
 }: CatalogSearchProps) {
   return (
-    <div className="flex max-w-md flex-col gap-1.5">
+    <div className="flex w-full max-w-xl flex-col gap-1.5">
       <Label htmlFor="catalog-search">Search</Label>
       <div className="relative">
         <Search
