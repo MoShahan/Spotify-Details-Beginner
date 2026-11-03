@@ -10,10 +10,10 @@
  */
 import 'dotenv/config';
 
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import bcrypt from 'bcrypt';
 
 import { PrismaClient } from '../src/generated/prisma/client.js';
+import { createMariaDbAdapterFromUrl } from '../src/lib/mariadb-adapter.js';
 import {
   getSeedImageKit,
   resolveArtistImage,
@@ -26,21 +26,7 @@ function createAdapter() {
     throw new Error('DATABASE_URL is required to run seed');
   }
 
-  const parsed = new URL(databaseUrl);
-  const sslMode = parsed.searchParams.get('sslaccept');
-
-  return new PrismaMariaDb({
-    host: parsed.hostname,
-    port: Number(parsed.port || 3306),
-    user: decodeURIComponent(parsed.username),
-    password: decodeURIComponent(parsed.password),
-    database: parsed.pathname.replace(/^\//, '') || undefined,
-    connectionLimit: 5,
-    ssl:
-      sslMode === 'strict'
-        ? { rejectUnauthorized: true }
-        : { rejectUnauthorized: false },
-  });
+  return createMariaDbAdapterFromUrl(databaseUrl);
 }
 
 const prisma = new PrismaClient({ adapter: createAdapter() });

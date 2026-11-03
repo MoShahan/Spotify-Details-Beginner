@@ -7,5 +7,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     // Shared TiDB - avoid parallel suites deleting each other's test users
     fileParallelism: false,
+    // Remote MySQL / TiDB round-trips can exceed Vitest defaults
+    testTimeout: 20_000,
+    hookTimeout: 30_000,
   },
 });

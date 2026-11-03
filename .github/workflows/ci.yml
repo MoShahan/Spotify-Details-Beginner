@@ -60,6 +60,22 @@ jobs:
   backend-test:
     name: Backend test
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: cadence
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/cadence
+      JWT_SECRET: ci-test-jwt-secret-cadence-16
     steps:
       - uses: actions/checkout@v4
 
@@ -73,10 +89,12 @@ jobs:
 
       - name: Generate Prisma client
         run: npm run prisma:generate -w cadence-api
-        env:
-          DATABASE_URL: mysql://user:pass@127.0.0.1:4000/cadence?sslaccept=strict
+
+      - name: Migrate database
+        run: npm exec -w cadence-api -- prisma migrate deploy
+
+      - name: Seed database
+        run: npm run prisma:seed -w cadence-api
 
       - name: Test api
         run: npm test -w cadence-api
-        env:
-          DATABASE_URL: mysql://user:pass@127.0.0.1:4000/cadence?sslaccept=strict
