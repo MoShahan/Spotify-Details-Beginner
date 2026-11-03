@@ -10,6 +10,7 @@ vi.mock('./lib/api', () => ({
     post: vi.fn(),
   },
   getApiErrorMessage: () => 'error',
+  setUnauthorizedSessionHandler: vi.fn(),
 }));
 
 describe('App shell', () => {

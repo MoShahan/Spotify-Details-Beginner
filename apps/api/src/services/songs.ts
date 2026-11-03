@@ -1,4 +1,5 @@
 import { normalizeArtistIds } from '../lib/artist-ids.js';
+import { releaseYearUtc, toDateOnly } from '../lib/dates.js';
 import { prisma } from '../lib/prisma.js';
 import {
   averageFromValues,
@@ -22,15 +23,7 @@ export type SongListItem = {
   createdAt: string;
 };
 
-function toDateOnly(value: Date): string {
-  return value.toISOString().slice(0, 10);
-}
-
-function releaseYearFromDate(value: Date): number {
-  return value.getUTCFullYear();
-}
-
-function mapSong(song: {
+export type SongMapperInput = {
   id: string;
   name: string;
   releaseDate: Date;
@@ -39,13 +32,15 @@ function mapSong(song: {
   createdAt: Date;
   artists: { artist: { id: string; name: string } }[];
   ratings: { value: { toString(): string } }[];
-}): SongListItem {
+};
+
+export function mapSong(song: SongMapperInput): SongListItem {
   const { averageRating, ratingCount } = averageFromValues(song.ratings);
   return {
     id: song.id,
     name: song.name,
     releaseDate: toDateOnly(song.releaseDate),
-    releaseYear: releaseYearFromDate(song.releaseDate),
+    releaseYear: releaseYearUtc(song.releaseDate),
     album: song.album,
     coverUrl: song.coverUrl,
     averageRating,

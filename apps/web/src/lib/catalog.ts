@@ -30,17 +30,7 @@ export type CatalogArtist = {
   ratingCount: number;
 };
 
-export type ArtistDetailSong = {
-  id: string;
-  name: string;
-  releaseDate: string;
-  releaseYear: number;
-  album: string | null;
-  coverUrl: string | null;
-  averageRating: number | null;
-  ratingCount: number;
-  artists: SongArtistRef[];
-};
+export type ArtistDetailSong = CatalogSong;
 
 export type ArtistDetail = CatalogArtist & {
   songs: ArtistDetailSong[];

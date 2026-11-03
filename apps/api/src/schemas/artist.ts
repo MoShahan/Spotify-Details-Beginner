@@ -1,11 +1,6 @@
 import { z } from 'zod';
 
-function emptyToUndefined(value: unknown): unknown {
-  if (value === '' || value === null) {
-    return undefined;
-  }
-  return value;
-}
+import { emptyToNull, emptyToUndefined } from './preprocess.js';
 
 export const createArtistBodySchema = z.object({
   name: z
@@ -43,12 +38,7 @@ export const createArtistBodySchema = z.object({
 /** PATCH artist image (empty string clears). */
 export const updateArtistImageBodySchema = z.object({
   imageUrl: z.preprocess(
-    (value) => {
-      if (value === '' || value === null) {
-        return null;
-      }
-      return value;
-    },
+    emptyToNull,
     z.union([
       z.string().trim().url('Image URL must be a valid URL').max(2048),
       z.null(),

@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CatalogSearch } from '../components/catalog/CatalogSearch';
@@ -7,7 +7,8 @@ import { CatalogThumb } from '../components/catalog/CatalogThumb';
 import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
 import { buttonVariants } from '../components/ui/button';
-import { api, getApiErrorMessage } from '../lib/api';
+import { useDebouncedCatalogQuery } from '../hooks/useDebouncedCatalogQuery';
+import { api } from '../lib/api';
 import {
   type ArtistSortBy,
   type CatalogArtist,
@@ -17,52 +18,25 @@ import {
 import { nextSortState } from '../lib/sort';
 import { cn } from '../lib/utils';
 
-type LoadState =
-  | { status: 'loading' }
-  | { status: 'error'; message: string }
-  | { status: 'ready'; artists: CatalogArtist[] };
-
 export function ArtistsPage() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<ArtistSortBy>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [state, setState] = useState<LoadState>({ status: 'loading' });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setState({ status: 'loading' });
-      try {
-        const res = await api.get<{ artists: CatalogArtist[] }>('/artists', {
-          params: {
-            q: search.trim() || undefined,
-            sortBy,
-            sortOrder,
-          },
-        });
-        if (!cancelled) {
-          setState({ status: 'ready', artists: res.data.artists });
-        }
-      } catch (error: unknown) {
-        if (!cancelled) {
-          setState({
-            status: 'error',
-            message: getApiErrorMessage(error, 'Could not load artists'),
-          });
-        }
-      }
-    }
-
-    const timer = window.setTimeout(() => {
-      void load();
-    }, 250);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [search, sortBy, sortOrder]);
+  const state = useDebouncedCatalogQuery({
+    deps: [search, sortBy, sortOrder],
+    errorMessage: 'Could not load artists',
+    load: async () => {
+      const res = await api.get<{ artists: CatalogArtist[] }>('/artists', {
+        params: {
+          q: search.trim() || undefined,
+          sortBy,
+          sortOrder,
+        },
+      });
+      return res.data.artists;
+    },
+  });
 
   function handleSort(column: ArtistSortBy) {
     const next = nextSortState(sortBy, sortOrder, column);
@@ -153,7 +127,7 @@ export function ArtistsPage() {
               </tr>
             ) : null}
 
-            {state.status === 'ready' && state.artists.length === 0 ? (
+            {state.status === 'ready' && state.data.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
@@ -165,7 +139,7 @@ export function ArtistsPage() {
             ) : null}
 
             {state.status === 'ready'
-              ? state.artists.map((artist) => (
+              ? state.data.map((artist) => (
                   <tr
                     key={artist.id}
                     className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"

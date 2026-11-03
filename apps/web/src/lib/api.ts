@@ -4,6 +4,13 @@ import { clearStoredToken, getStoredToken } from './auth-storage';
 
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
+let onUnauthorizedSession: (() => void) | null = null;
+
+/** Register a callback when a non-login/register request gets 401. */
+export function setUnauthorizedSessionHandler(handler: (() => void) | null) {
+  onUnauthorizedSession = handler;
+}
+
 export const api = axios.create({
   baseURL,
   headers: {
@@ -28,6 +35,7 @@ api.interceptors.response.use(
         url.includes('/auth/login') || url.includes('/auth/register');
       if (!isAuthForm) {
         clearStoredToken();
+        onUnauthorizedSession?.();
       }
     }
     return Promise.reject(error);
@@ -45,17 +53,20 @@ export function getApiErrorMessage(
   error: unknown,
   fallback = 'Something went wrong',
 ): string {
-  if (!isAxiosError(error)) {
+  if (isAxiosError(error)) {
+    const data: unknown = error.response?.data;
+    if (
+      typeof data === 'object' &&
+      data !== null &&
+      'error' in data &&
+      typeof (data as ApiErrorBody).error?.message === 'string'
+    ) {
+      return (data as ApiErrorBody).error.message;
+    }
     return fallback;
   }
-  const data: unknown = error.response?.data;
-  if (
-    typeof data === 'object' &&
-    data !== null &&
-    'error' in data &&
-    typeof (data as ApiErrorBody).error?.message === 'string'
-  ) {
-    return (data as ApiErrorBody).error.message;
+  if (error instanceof Error && error.message.trim() !== '') {
+    return error.message;
   }
   return fallback;
 }

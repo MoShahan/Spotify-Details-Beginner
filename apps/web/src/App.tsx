@@ -24,62 +24,15 @@ export default function App() {
         <SessionGate>
           <Routes>
             <Route element={<AppShell />}>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <HomePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/songs"
-                element={
-                  <ProtectedRoute>
-                    <SongsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/songs/new"
-                element={
-                  <ProtectedRoute>
-                    <NewSongPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/songs/:id"
-                element={
-                  <ProtectedRoute>
-                    <SongDetailPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/artists"
-                element={
-                  <ProtectedRoute>
-                    <ArtistsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/artists/new"
-                element={
-                  <ProtectedRoute>
-                    <NewArtistPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/artists/:id"
-                element={
-                  <ProtectedRoute>
-                    <ArtistDetailPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/songs" element={<SongsPage />} />
+                <Route path="/songs/new" element={<NewSongPage />} />
+                <Route path="/songs/:id" element={<SongDetailPage />} />
+                <Route path="/artists" element={<ArtistsPage />} />
+                <Route path="/artists/new" element={<NewArtistPage />} />
+                <Route path="/artists/:id" element={<ArtistDetailPage />} />
+              </Route>
               <Route path="/about" element={<AboutPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

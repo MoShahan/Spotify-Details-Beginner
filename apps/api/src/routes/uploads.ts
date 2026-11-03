@@ -3,7 +3,10 @@ import { Router } from 'express';
 import { createImageKitAuth } from '../lib/imagekit.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
-import { imageKitAuthBodySchema } from '../schemas/uploads.js';
+import {
+  type ImageKitAuthBody,
+  imageKitAuthBodySchema,
+} from '../schemas/uploads.js';
 
 export const uploadsRouter = Router();
 
@@ -17,7 +20,7 @@ uploadsRouter.post(
   validateRequest(imageKitAuthBodySchema, 'body'),
   (req, res, next) => {
     try {
-      const body = imageKitAuthBodySchema.parse(req.body);
+      const body = req.body as ImageKitAuthBody;
       const auth = createImageKitAuth(body.folder);
       res.status(200).json(auth);
     } catch (error: unknown) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { ArtistLinkList } from '../components/catalog/ArtistLinkList';
 import { TopListsSkeleton } from '../components/home/TopListsSkeleton';
 import { useAuth } from '../contexts/auth';
 import { api, getApiErrorMessage } from '../lib/api';
@@ -109,19 +110,10 @@ function TopSongsList({ songs }: { songs: TopSong[] }) {
                   </Link>
                 </p>
                 <p className="truncate text-sm text-[var(--cadence-fg-muted)]">
-                  {song.artists.length === 0
-                    ? 'Unknown artist'
-                    : song.artists.map((a, i) => (
-                        <span key={a.id}>
-                          {i > 0 ? ', ' : null}
-                          <Link
-                            to={`/artists/${a.id}`}
-                            className="underline-offset-4 hover:underline"
-                          >
-                            {a.name}
-                          </Link>
-                        </span>
-                      ))}
+                  <ArtistLinkList
+                    artists={song.artists}
+                    empty="Unknown artist"
+                  />
                 </p>
               </div>
               <span className="shrink-0 text-sm font-medium tabular-nums text-[var(--cadence-fg)]">

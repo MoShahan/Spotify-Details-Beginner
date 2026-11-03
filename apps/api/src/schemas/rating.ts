@@ -13,9 +13,4 @@ export const upsertRatingBodySchema = z.object({
   value: ratingValueSchema,
 });
 
-export const songIdParamsSchema = z.object({
-  id: z.string().min(1, 'Song id is required'),
-});
-
 export type UpsertRatingBody = z.infer<typeof upsertRatingBodySchema>;
-export type SongIdParams = z.infer<typeof songIdParamsSchema>;

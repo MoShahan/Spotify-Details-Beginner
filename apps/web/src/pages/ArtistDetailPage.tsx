@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
-import { CatalogThumb } from '../components/catalog/CatalogThumb';
-import { SortableTh } from '../components/catalog/SortableTh';
+import { SongCatalogTable } from '../components/catalog/SongCatalogTable';
 import { Skeleton } from '../components/ui/skeleton';
 import { api, getApiErrorMessage } from '../lib/api';
 import {
@@ -261,104 +260,12 @@ export function ArtistDetailPage() {
             No songs linked yet.
           </p>
         ) : (
-          <div className="cadence-panel overflow-x-auto">
-            <table className="w-full min-w-[40rem] border-collapse text-sm">
-              <thead className="bg-[var(--cadence-muted)]/45">
-                <tr>
-                  <th
-                    scope="col"
-                    className="w-14 border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
-                  >
-                    <span className="sr-only">Cover</span>
-                  </th>
-                  <SortableTh
-                    label="Name"
-                    column="name"
-                    activeColumn={sortBy}
-                    sortOrder={sortOrder}
-                    onSort={handleSort}
-                  />
-                  <th
-                    scope="col"
-                    className="border-b border-[var(--cadence-border)] px-3 py-3 text-left text-xs font-semibold tracking-wide text-[var(--cadence-fg-muted)] uppercase"
-                  >
-                    Artists
-                  </th>
-                  <SortableTh
-                    label="Album"
-                    column="album"
-                    activeColumn={sortBy}
-                    sortOrder={sortOrder}
-                    onSort={handleSort}
-                  />
-                  <SortableTh
-                    label="Year"
-                    column="releaseYear"
-                    activeColumn={sortBy}
-                    sortOrder={sortOrder}
-                    onSort={handleSort}
-                  />
-                  <SortableTh
-                    label="Rating"
-                    column="rating"
-                    activeColumn={sortBy}
-                    sortOrder={sortOrder}
-                    onSort={handleSort}
-                    align="right"
-                  />
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSongs.map((song) => (
-                  <tr
-                    key={song.id}
-                    className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/25 hover:bg-[var(--cadence-muted)]/55"
-                  >
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-2">
-                      <Link to={`/songs/${song.id}`} tabIndex={-1}>
-                        <CatalogThumb
-                          src={song.coverUrl}
-                          alt={`${song.name} cover`}
-                        />
-                      </Link>
-                    </td>
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 font-medium text-[var(--cadence-fg)]">
-                      <Link
-                        to={`/songs/${song.id}`}
-                        className="underline-offset-4 hover:underline"
-                      >
-                        {song.name}
-                      </Link>
-                    </td>
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-[var(--cadence-fg-muted)]">
-                      {song.artists.length === 0
-                        ? '-'
-                        : song.artists.map((a, index) => (
-                            <span key={a.id}>
-                              {index > 0 ? ', ' : null}
-                              <Link
-                                to={`/artists/${a.id}`}
-                                className="underline-offset-4 hover:underline"
-                              >
-                                {a.name}
-                              </Link>
-                            </span>
-                          ))}
-                    </td>
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-[var(--cadence-fg-muted)]">
-                      {song.album ?? '-'}
-                    </td>
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 tabular-nums text-[var(--cadence-fg-muted)]">
-                      {song.releaseYear}
-                    </td>
-                    <td className="border-b border-[var(--cadence-border)] px-3 py-3 text-right font-medium tabular-nums text-[var(--cadence-fg)]">
-                      {formatRating(song.averageRating)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <SongCatalogTable
+            songs={sortedSongs}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+          />
         )}
       </div>
     </section>

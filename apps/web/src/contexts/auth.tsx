@@ -6,7 +6,11 @@ import {
   useState,
 } from 'react';
 
-import { api, getApiErrorMessage } from '../lib/api';
+import {
+  api,
+  getApiErrorMessage,
+  setUnauthorizedSessionHandler,
+} from '../lib/api';
 import {
   clearStoredToken,
   getStoredToken,
@@ -47,6 +51,15 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setUnauthorizedSessionHandler(() => {
+      setUser(null);
+    });
+    return () => {
+      setUnauthorizedSessionHandler(null);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

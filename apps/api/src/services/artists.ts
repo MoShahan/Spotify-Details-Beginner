@@ -1,3 +1,4 @@
+import { toDateOnly } from '../lib/dates.js';
 import { prisma } from '../lib/prisma.js';
 import {
   averageFromValues,
@@ -7,6 +8,7 @@ import {
 } from '../lib/ratings.js';
 import type { CreateArtistBody } from '../schemas/artist.js';
 import type { ListArtistsQuery } from '../schemas/list-query.js';
+import { mapSong, type SongListItem } from './songs.js';
 
 export type ArtistListItem = {
   id: string;
@@ -18,27 +20,13 @@ export type ArtistListItem = {
   ratingCount: number;
 };
 
-export type ArtistSongSummary = {
-  id: string;
-  name: string;
-  releaseDate: string;
-  releaseYear: number;
-  album: string | null;
-  coverUrl: string | null;
-  averageRating: number | null;
-  ratingCount: number;
-  artists: Array<{ id: string; name: string }>;
-};
+export type ArtistSongSummary = Omit<SongListItem, 'createdAt'>;
 
 export type ArtistDetail = ArtistListItem & {
   songs: ArtistSongSummary[];
 };
 
 export type ArtistTopItem = ArtistListItem;
-
-function toDateOnly(value: Date): string {
-  return value.toISOString().slice(0, 10);
-}
 
 function matchesArtistQuery(artist: ArtistListItem, q: string): boolean {
   const needle = q.toLowerCase();
@@ -155,6 +143,7 @@ export async function getArtistById(id: string): Promise<ArtistDetail | null> {
               releaseDate: true,
               album: true,
               coverUrl: true,
+              createdAt: true,
               ratings: { select: { value: true } },
               artists: {
                 select: {
@@ -176,20 +165,17 @@ export async function getArtistById(id: string): Promise<ArtistDetail | null> {
   const { averageRating, ratingCount } = averageFromValues(allRatings);
 
   const songs: ArtistSongSummary[] = artist.songs.map((link) => {
-    const songAvg = averageFromValues(link.song.ratings);
+    const mapped = mapSong(link.song);
     return {
-      id: link.song.id,
-      name: link.song.name,
-      releaseDate: toDateOnly(link.song.releaseDate),
-      releaseYear: link.song.releaseDate.getUTCFullYear(),
-      album: link.song.album,
-      coverUrl: link.song.coverUrl,
-      averageRating: songAvg.averageRating,
-      ratingCount: songAvg.ratingCount,
-      artists: link.song.artists.map((songArtist) => ({
-        id: songArtist.artist.id,
-        name: songArtist.artist.name,
-      })),
+      id: mapped.id,
+      name: mapped.name,
+      releaseDate: mapped.releaseDate,
+      releaseYear: mapped.releaseYear,
+      album: mapped.album,
+      coverUrl: mapped.coverUrl,
+      averageRating: mapped.averageRating,
+      ratingCount: mapped.ratingCount,
+      artists: mapped.artists,
     };
   });
 

@@ -2,6 +2,7 @@ import { ImagePlus } from 'lucide-react';
 import { type ChangeEvent, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import { getApiErrorMessage } from '../../lib/api';
 import {
   type ImageKitFolderKind,
   uploadImageToImageKit,
@@ -45,9 +46,7 @@ export function CoverPicker({
       onChange(url);
       toast.success('Image uploaded');
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Could not upload image';
-      toast.error(message);
+      toast.error(getApiErrorMessage(error, 'Could not upload image'));
     } finally {
       setUploading(false);
       if (fileRef.current) {

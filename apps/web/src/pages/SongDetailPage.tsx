@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
+import { ArtistLinkList } from '../components/catalog/ArtistLinkList';
 import { CatalogImageEditor } from '../components/catalog/CatalogImageEditor';
 import { SongRatingControl } from '../components/catalog/SongRatingControl';
 import { Button } from '../components/ui/button';
@@ -54,9 +56,13 @@ export function SongDetailPage() {
     if (!id) {
       return;
     }
-    const res = await api.get<{ song: SongDetail }>(`/songs/${id}`);
-    setState({ status: 'ready', song: res.data.song });
-    setEditingRating(false);
+    try {
+      const res = await api.get<{ song: SongDetail }>(`/songs/${id}`);
+      setState({ status: 'ready', song: res.data.song });
+      setEditingRating(false);
+    } catch (error: unknown) {
+      toast.error(getApiErrorMessage(error, 'Could not refresh song'));
+    }
   }
 
   async function saveCover(coverUrl: string | null) {
@@ -127,19 +133,7 @@ export function SongDetailPage() {
             <div>
               <dt className="text-[var(--cadence-fg-muted)]">Artists</dt>
               <dd className="mt-1 font-medium">
-                {song.artists.length === 0
-                  ? '-'
-                  : song.artists.map((artist, index) => (
-                      <span key={artist.id}>
-                        {index > 0 ? ', ' : null}
-                        <Link
-                          to={`/artists/${artist.id}`}
-                          className="underline underline-offset-4"
-                        >
-                          {artist.name}
-                        </Link>
-                      </span>
-                    ))}
+                <ArtistLinkList artists={song.artists} underline />
               </dd>
             </div>
             <div>

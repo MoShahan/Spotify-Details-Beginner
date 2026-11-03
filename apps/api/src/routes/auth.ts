@@ -2,7 +2,12 @@ import { Router } from 'express';
 
 import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
-import { loginBodySchema, registerBodySchema } from '../schemas/auth.js';
+import {
+  type LoginBody,
+  loginBodySchema,
+  type RegisterBody,
+  registerBodySchema,
+} from '../schemas/auth.js';
 import { getUserById, loginUser, registerUser } from '../services/auth.js';
 
 export const authRouter = Router();
@@ -12,7 +17,7 @@ authRouter.post(
   validateRequest(registerBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const body = registerBodySchema.parse(req.body);
+      const body = req.body as RegisterBody;
       const result = await registerUser(body);
 
       if (!result.ok) {
@@ -34,7 +39,7 @@ authRouter.post(
   validateRequest(loginBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const body = loginBodySchema.parse(req.body);
+      const body = req.body as LoginBody;
       const result = await loginUser(body);
 
       if (!result.ok) {
@@ -53,18 +58,7 @@ authRouter.post(
 
 authRouter.get('/me', requireAuth, async (req, res, next) => {
   try {
-    const userId = req.auth?.userId;
-    if (!userId) {
-      res.status(401).json({
-        error: {
-          code: 'AUTH_REQUIRED',
-          message: 'Authentication required',
-        },
-      });
-      return;
-    }
-
-    const user = await getUserById(userId);
+    const user = await getUserById(req.auth!.userId);
     if (!user) {
       res.status(401).json({
         error: {

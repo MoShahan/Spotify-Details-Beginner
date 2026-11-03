@@ -1,11 +1,6 @@
 import { z } from 'zod';
 
-function emptyToUndefined(value: unknown): unknown {
-  if (value === '' || value === null) {
-    return undefined;
-  }
-  return value;
-}
+import { emptyToNull, emptyToUndefined } from './preprocess.js';
 
 export const createSongBodySchema = z.object({
   name: z
@@ -47,12 +42,7 @@ export const createSongBodySchema = z.object({
 /** PATCH song cover (empty string clears). */
 export const updateSongCoverBodySchema = z.object({
   coverUrl: z.preprocess(
-    (value) => {
-      if (value === '' || value === null) {
-        return null;
-      }
-      return value;
-    },
+    emptyToNull,
     z.union([
       z.string().trim().url('Cover URL must be a valid URL').max(2048),
       z.null(),

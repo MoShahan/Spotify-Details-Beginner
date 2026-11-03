@@ -3,14 +3,19 @@ import { Router } from 'express';
 import { normalizeArtistIds } from '../lib/artist-ids.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
-import { idParamsSchema } from '../schemas/ids.js';
-import { listSongsQuerySchema } from '../schemas/list-query.js';
+import { type IdParams, idParamsSchema } from '../schemas/ids.js';
 import {
-  songIdParamsSchema,
+  type ListSongsQuery,
+  listSongsQuerySchema,
+} from '../schemas/list-query.js';
+import {
+  type UpsertRatingBody,
   upsertRatingBodySchema,
 } from '../schemas/rating.js';
 import {
+  type CreateSongBody,
   createSongBodySchema,
+  type UpdateSongCoverBody,
   updateSongCoverBodySchema,
 } from '../schemas/song.js';
 import {
@@ -50,7 +55,7 @@ songsRouter.get(
   validateRequest(listSongsQuerySchema, 'query'),
   async (req, res, next) => {
     try {
-      const query = listSongsQuerySchema.parse(req.query);
+      const query = req.query as unknown as ListSongsQuery;
       const songs = await listSongs(query);
       res.status(200).json({ songs });
     } catch (error: unknown) {
@@ -70,18 +75,9 @@ songsRouter.post(
   validateRequest(createSongBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const body = createSongBodySchema.parse(req.body);
+      const body = req.body as CreateSongBody;
       const artistIds = normalizeArtistIds(body.artistIds);
-      const userId = req.auth?.userId;
-      if (!userId) {
-        res.status(401).json({
-          error: {
-            code: 'AUTH_REQUIRED',
-            message: 'Authentication required to create a song',
-          },
-        });
-        return;
-      }
+      const userId = req.auth!.userId;
 
       const missing = await findMissingArtistIds(artistIds);
       if (missing.length > 0) {
@@ -128,8 +124,8 @@ songsRouter.get(
   validateRequest(idParamsSchema, 'params'),
   async (req, res, next) => {
     try {
-      const { id } = idParamsSchema.parse(req.params);
-      const song = await getSongById(id, req.auth?.userId);
+      const { id } = req.params as IdParams;
+      const song = await getSongById(id, req.auth!.userId);
       if (!song) {
         res.status(404).json({
           error: { code: 'NOT_FOUND', message: 'Song not found' },
@@ -153,12 +149,12 @@ songsRouter.patch(
   validateRequest(updateSongCoverBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const { id } = idParamsSchema.parse(req.params);
-      const body = updateSongCoverBodySchema.parse(req.body);
+      const { id } = req.params as IdParams;
+      const body = req.body as UpdateSongCoverBody;
       const song = await updateSongCoverUrl(
         id,
         body.coverUrl,
-        req.auth?.userId,
+        req.auth!.userId,
       );
       if (!song) {
         res.status(404).json({
@@ -179,22 +175,13 @@ songsRouter.patch(
 songsRouter.post(
   '/:id/ratings',
   requireAuth,
-  validateRequest(songIdParamsSchema, 'params'),
+  validateRequest(idParamsSchema, 'params'),
   validateRequest(upsertRatingBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const { id: songId } = songIdParamsSchema.parse(req.params);
-      const body = upsertRatingBodySchema.parse(req.body);
-      const userId = req.auth?.userId;
-      if (!userId) {
-        res.status(401).json({
-          error: {
-            code: 'AUTH_REQUIRED',
-            message: 'Authentication required to rate a song',
-          },
-        });
-        return;
-      }
+      const { id: songId } = req.params as IdParams;
+      const body = req.body as UpsertRatingBody;
+      const userId = req.auth!.userId;
 
       const rating = await upsertSongRating(userId, songId, body.value);
       if (!rating) {

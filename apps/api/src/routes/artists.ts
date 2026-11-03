@@ -3,11 +3,16 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validate.js';
 import {
+  type CreateArtistBody,
   createArtistBodySchema,
+  type UpdateArtistImageBody,
   updateArtistImageBodySchema,
 } from '../schemas/artist.js';
-import { idParamsSchema } from '../schemas/ids.js';
-import { listArtistsQuerySchema } from '../schemas/list-query.js';
+import { type IdParams, idParamsSchema } from '../schemas/ids.js';
+import {
+  type ListArtistsQuery,
+  listArtistsQuerySchema,
+} from '../schemas/list-query.js';
 import {
   createArtist,
   getArtistById,
@@ -41,7 +46,7 @@ artistsRouter.get(
   validateRequest(listArtistsQuerySchema, 'query'),
   async (req, res, next) => {
     try {
-      const query = listArtistsQuerySchema.parse(req.query);
+      const query = req.query as unknown as ListArtistsQuery;
       const artists = await listArtists(query);
       res.status(200).json({ artists });
     } catch (error: unknown) {
@@ -60,7 +65,7 @@ artistsRouter.post(
   validateRequest(createArtistBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const body = createArtistBodySchema.parse(req.body);
+      const body = req.body as CreateArtistBody;
       const existing = await findArtistByName(body.name);
 
       if (existing) {
@@ -90,7 +95,7 @@ artistsRouter.get(
   validateRequest(idParamsSchema, 'params'),
   async (req, res, next) => {
     try {
-      const { id } = idParamsSchema.parse(req.params);
+      const { id } = req.params as IdParams;
       const artist = await getArtistById(id);
       if (!artist) {
         res.status(404).json({
@@ -115,8 +120,8 @@ artistsRouter.patch(
   validateRequest(updateArtistImageBodySchema, 'body'),
   async (req, res, next) => {
     try {
-      const { id } = idParamsSchema.parse(req.params);
-      const body = updateArtistImageBodySchema.parse(req.body);
+      const { id } = req.params as IdParams;
+      const body = req.body as UpdateArtistImageBody;
       const artist = await updateArtistImageUrl(id, body.imageUrl);
       if (!artist) {
         res.status(404).json({

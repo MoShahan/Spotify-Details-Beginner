@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { toast } from 'sonner';
 
+import { getApiErrorMessage } from '../../lib/api';
 import {
   type ImageKitFolderKind,
   uploadImageToImageKit,
@@ -72,9 +73,7 @@ export function CatalogImageEditor({
       toast.success(successMessage);
       setEditing(false);
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : `Could not update ${label}`;
-      toast.error(message);
+      toast.error(getApiErrorMessage(error, `Could not update ${label}`));
     } finally {
       setBusy(false);
     }
@@ -105,9 +104,7 @@ export function CatalogImageEditor({
       toast.success(`${label} uploaded`);
       setEditing(false);
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : `Could not upload ${label}`;
-      toast.error(message);
+      toast.error(getApiErrorMessage(error, `Could not upload ${label}`));
     } finally {
       setBusy(false);
       if (fileInputRef.current) {

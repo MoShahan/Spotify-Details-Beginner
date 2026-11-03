@@ -1,13 +1,8 @@
 import { z } from 'zod';
 
-const sortOrderSchema = z.enum(['asc', 'desc']).default('asc');
+import { emptyToUndefined } from './preprocess.js';
 
-function emptyToUndefined(value: unknown): unknown {
-  if (value === '' || value === null) {
-    return undefined;
-  }
-  return value;
-}
+const sortOrderSchema = z.enum(['asc', 'desc']).default('asc');
 
 export const listSongsQuerySchema = z.object({
   q: z.preprocess(emptyToUndefined, z.string().trim().max(100).optional()),
