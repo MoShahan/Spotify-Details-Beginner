@@ -6,15 +6,10 @@ Instructions for AI coding agents and humans working in this repo.
 
 **Sources of truth**
 
-| Doc                                        | Use for                                                              |
-| ------------------------------------------ | -------------------------------------------------------------------- |
-| [`TODO.md`](TODO.md)                       | **Linear checklist** - IDs like **1.1.1** (primary day-to-day to-do) |
-| [`plan.md`](plan.md)                       | Stack decisions, API tables, domain notes (reference, not the to-do) |
-| [`question.md`](question.md)               | Product requirements                                                 |
-| [`features-status.md`](features-status.md) | What’s Done / Partial / Pending                                      |
-| [`AGENTS.md`](AGENTS.md)                   | How to work in the repo (this file)                                  |
-
-When the user cites a checklist ID, open **`TODO.md`** first.
+| Doc                      | Use for                                |
+| ------------------------ | -------------------------------------- |
+| [`AGENTS.md`](AGENTS.md) | How to work in the repo (this file)    |
+| [`README.md`](README.md) | Setup, stack, env, deploy, validations |
 
 ---
 
@@ -55,9 +50,6 @@ cadence/
 ├── scripts/                 # Repo tooling (e.g. fix-em-dash)
 ├── apps/api/.env            # Secrets - NEVER commit
 ├── apps/api/.env.example    # Safe template - commit OK
-├── plan.md
-├── question.md
-├── features-status.md
 ├── AGENTS.md
 └── README.md
 ```
@@ -130,7 +122,7 @@ API-local (from `apps/api`): Prisma `migrate`, `generate`, `db seed` as document
 5. **Web** - light/dark on every page; **mobile responsive** (phone → desktop); **skeleton loaders** while fetching (never circular spinners); empty / error states; toasts via Sonner.
 6. **DB** - normalized schema (`users`, `artists`, `songs`, `song_artists`, `ratings`); no denormalized CSV artists or rating-on-song-row. Keep catalog uniqueness in the **API** (not hard DB uniques on artist/song names) so rules can evolve. Current rules + Coming soon: see README.
 7. **Don’t** bypass pre-commit with `--no-verify` in normal workflow.
-8. **Don’t** expand scope into plan §15 (out of scope) unless the user asks.
+8. **Don’t** expand into out-of-scope stretch (Spotify player, GraphQL, Docker) unless the user asks.
 
 ---
 
@@ -162,18 +154,17 @@ Browser → Vercel (apps/web)
 
 ## How agents should work
 
-1. Prefer checklist IDs from `plan.md` (§12 phases, §14 master list).
-2. Match existing patterns once `apps/web` and `apps/api` exist; don’t invent a second stack.
-3. Keep diffs focused - no drive-by refactors or unsolicited markdown docs.
-4. After substantive edits, run lint/typecheck for touched packages when available.
-5. Secrets: read `.env.example`, never paste real secrets into commits, README, or chat logs if avoidable.
-6. Em-dash rule applies to docs and code strings alike.
+1. Match existing patterns in `apps/web` and `apps/api`; don’t invent a second stack.
+2. Keep diffs focused - no drive-by refactors or unsolicited markdown docs.
+3. After substantive edits, run lint/typecheck for touched packages when available.
+4. Secrets: read `.env.example`, never paste real secrets into commits, README, or chat logs if avoidable.
+5. Em-dash rule applies to docs and code strings alike.
 
 ---
 
 ## Phase pointer
 
-See [`TODO.md`](TODO.md). Phase 1 API and Phase 2 catalog UI (Home rate, New Song, About) are done. Next: Phase 3 deploy when ready.
+Phases 0–3 are shipped (API, web catalog, deploy, docs). Coming soon items are listed in the README.
 
 ## Cursor rules
 
