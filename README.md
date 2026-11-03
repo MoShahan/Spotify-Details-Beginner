@@ -12,14 +12,29 @@ Personal full-stack **music catalog** - rate songs, rank artists, add covers. Po
 
 ## Screenshots
 
-|               |                                                      |
-| ------------- | ---------------------------------------------------- |
-| Login         | ![Login](docs/assets/screenshot-login.png)           |
-| Home (Top 10) | ![Home](docs/assets/screenshot-home.png)             |
-| Songs         | ![Songs](docs/assets/screenshot-songs.png)           |
-| Artists       | ![Artists](docs/assets/screenshot-artists.png)       |
-| New song      | ![New song](docs/assets/screenshot-new-song.png)     |
-| New artist    | ![New artist](docs/assets/screenshot-new-artist.png) |
+### Login
+
+![Login](docs/assets/screenshot-login.png)
+
+### Home (Top 10)
+
+![Home](docs/assets/screenshot-home.png)
+
+### Songs
+
+![Songs](docs/assets/screenshot-songs.png)
+
+### Artists
+
+![Artists](docs/assets/screenshot-artists.png)
+
+### New song
+
+![New song](docs/assets/screenshot-new-song.png)
+
+### New artist
+
+![New artist](docs/assets/screenshot-new-artist.png)
 
 > If images are missing locally, pull latest or re-capture from the live site after login.
 
