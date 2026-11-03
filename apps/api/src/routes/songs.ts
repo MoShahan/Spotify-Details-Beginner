@@ -46,8 +46,8 @@ songsRouter.get('/top', requireAuth, async (_req, res, next) => {
 });
 
 /**
- * List all songs (auth). Includes artists + average rating.
- * Query: `q`, `sortBy` (name|rating|releaseYear|album), `sortOrder` (asc|desc).
+ * List songs (auth). Includes artists + average rating.
+ * Query: `q`, `sortBy`, `sortOrder`, `limit` (default 20), `offset` (default 0).
  */
 songsRouter.get(
   '/',
@@ -56,8 +56,8 @@ songsRouter.get(
   async (req, res, next) => {
     try {
       const query = req.query as unknown as ListSongsQuery;
-      const songs = await listSongs(query);
-      res.status(200).json({ songs });
+      const page = await listSongs(query);
+      res.status(200).json(page);
     } catch (error: unknown) {
       next(error);
     }

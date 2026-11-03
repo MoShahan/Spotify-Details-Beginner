@@ -1,5 +1,6 @@
 import { normalizeArtistIds } from '../lib/artist-ids.js';
 import { releaseYearUtc, toDateOnly } from '../lib/dates.js';
+import { paginateItems } from '../lib/pagination.js';
 import { prisma } from '../lib/prisma.js';
 import {
   averageFromValues,
@@ -113,9 +114,13 @@ function sortSongs(
   return sorted;
 }
 
-/** List songs with optional search + sort (auth required at route). */
-export async function listSongs(
-  query: ListSongsQuery = { sortBy: 'name', sortOrder: 'asc' },
+export type SongListPage = {
+  songs: SongListItem[];
+  hasMore: boolean;
+};
+
+async function loadFilteredSortedSongs(
+  query: Pick<ListSongsQuery, 'q' | 'sortBy' | 'sortOrder'>,
 ): Promise<SongListItem[]> {
   const songs = await prisma.song.findMany({
     include: songListInclude,
@@ -128,9 +133,26 @@ export async function listSongs(
   return sortSongs(items, query.sortBy, query.sortOrder);
 }
 
+/** List songs with optional search + sort + offset/limit (auth at route). */
+export async function listSongs(
+  query: ListSongsQuery = {
+    sortBy: 'name',
+    sortOrder: 'asc',
+    limit: 20,
+    offset: 0,
+  },
+): Promise<SongListPage> {
+  const items = await loadFilteredSortedSongs(query);
+  const page = paginateItems(items, query.offset, query.limit);
+  return { songs: page.items, hasMore: page.hasMore };
+}
+
 /** Top 10 songs by average rating (unrated last). */
 export async function listTopSongs(limit = 10): Promise<SongListItem[]> {
-  const songs = await listSongs({ sortBy: 'name', sortOrder: 'asc' });
+  const songs = await loadFilteredSortedSongs({
+    sortBy: 'name',
+    sortOrder: 'asc',
+  });
   return [...songs].sort(compareByAverageThenName).slice(0, limit);
 }
 

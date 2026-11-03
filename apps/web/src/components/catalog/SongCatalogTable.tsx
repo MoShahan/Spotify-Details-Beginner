@@ -16,9 +16,11 @@ type SongCatalogTableProps = {
   sortBy: SongSortBy;
   sortOrder: SortOrder;
   onSort: (column: SongSortBy) => void;
-  status?: 'loading' | 'error' | 'ready';
+  status?: 'loading' | 'loadingMore' | 'error' | 'ready';
   errorMessage?: string;
   emptyMessage?: string;
+  hasMore?: boolean;
+  sentinelRef?: (node: Element | null) => void;
 };
 
 export function SongCatalogTable({
@@ -29,7 +31,11 @@ export function SongCatalogTable({
   status = 'ready',
   errorMessage,
   emptyMessage = 'No songs match your search.',
+  hasMore = false,
+  sentinelRef,
 }: SongCatalogTableProps) {
+  const showRows = status === 'ready' || status === 'loadingMore';
+
   return (
     <div className="cadence-panel overflow-x-auto">
       <table className="w-full min-w-[40rem] border-collapse text-sm">
@@ -93,7 +99,7 @@ export function SongCatalogTable({
             </tr>
           ) : null}
 
-          {status === 'ready' && songs.length === 0 ? (
+          {showRows && songs.length === 0 ? (
             <tr>
               <td
                 colSpan={6}
@@ -104,7 +110,7 @@ export function SongCatalogTable({
             </tr>
           ) : null}
 
-          {status === 'ready'
+          {showRows
             ? songs.map((song) => (
                 <tr
                   key={song.id}
@@ -142,6 +148,16 @@ export function SongCatalogTable({
                 </tr>
               ))
             : null}
+
+          {status === 'loadingMore' ? (
+            <TableBodySkeleton columns={6} rows={3} />
+          ) : null}
+
+          {showRows && hasMore ? (
+            <tr ref={sentinelRef} aria-hidden="true">
+              <td colSpan={6} className="h-1 p-0" />
+            </tr>
+          ) : null}
         </tbody>
       </table>
     </div>

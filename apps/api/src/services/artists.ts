@@ -1,4 +1,5 @@
 import { toDateOnly } from '../lib/dates.js';
+import { paginateItems } from '../lib/pagination.js';
 import { prisma } from '../lib/prisma.js';
 import {
   averageFromValues,
@@ -105,15 +106,33 @@ async function loadArtistsWithRatings(): Promise<ArtistListItem[]> {
   });
 }
 
-/** All artists with averages; optional search + sort (auth required at route). */
-export async function listArtists(
-  query: ListArtistsQuery = { sortBy: 'name', sortOrder: 'asc' },
+export type ArtistListPage = {
+  artists: ArtistListItem[];
+  hasMore: boolean;
+};
+
+async function loadFilteredSortedArtists(
+  query: Pick<ListArtistsQuery, 'q' | 'sortBy' | 'sortOrder'>,
 ): Promise<ArtistListItem[]> {
   let items = await loadArtistsWithRatings();
   if (query.q) {
     items = items.filter((artist) => matchesArtistQuery(artist, query.q ?? ''));
   }
   return sortArtists(items, query.sortBy, query.sortOrder);
+}
+
+/** Artists with averages; optional search + sort + offset/limit (auth at route). */
+export async function listArtists(
+  query: ListArtistsQuery = {
+    sortBy: 'name',
+    sortOrder: 'asc',
+    limit: 20,
+    offset: 0,
+  },
+): Promise<ArtistListPage> {
+  const items = await loadFilteredSortedArtists(query);
+  const page = paginateItems(items, query.offset, query.limit);
+  return { artists: page.items, hasMore: page.hasMore };
 }
 
 /**

@@ -6,9 +6,10 @@ import { CatalogSearch } from '../components/catalog/CatalogSearch';
 import { SongCatalogTable } from '../components/catalog/SongCatalogTable';
 import { PageHeader } from '../components/layout/PageHeader';
 import { buttonVariants } from '../components/ui/button';
-import { useDebouncedCatalogQuery } from '../hooks/useDebouncedCatalogQuery';
+import { useInfiniteCatalogQuery } from '../hooks/useInfiniteCatalogQuery';
 import { api } from '../lib/api';
 import {
+  CATALOG_PAGE_SIZE,
   type CatalogSong,
   type SongSortBy,
   type SortOrder,
@@ -21,18 +22,23 @@ export function SongsPage() {
   const [sortBy, setSortBy] = useState<SongSortBy>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  const state = useDebouncedCatalogQuery({
+  const state = useInfiniteCatalogQuery({
     deps: [search, sortBy, sortOrder],
     errorMessage: 'Could not load songs',
-    load: async () => {
-      const res = await api.get<{ songs: CatalogSong[] }>('/songs', {
-        params: {
-          q: search.trim() || undefined,
-          sortBy,
-          sortOrder,
+    loadPage: async (offset) => {
+      const res = await api.get<{ songs: CatalogSong[]; hasMore: boolean }>(
+        '/songs',
+        {
+          params: {
+            q: search.trim() || undefined,
+            sortBy,
+            sortOrder,
+            limit: CATALOG_PAGE_SIZE,
+            offset,
+          },
         },
-      });
-      return res.data.songs;
+      );
+      return { items: res.data.songs, hasMore: res.data.hasMore };
     },
   });
 
@@ -62,12 +68,14 @@ export function SongsPage() {
       />
 
       <SongCatalogTable
-        songs={state.status === 'ready' ? state.data : []}
+        songs={state.items}
         sortBy={sortBy}
         sortOrder={sortOrder}
         onSort={handleSort}
         status={state.status}
-        errorMessage={state.status === 'error' ? state.message : undefined}
+        errorMessage={state.message}
+        hasMore={state.hasMore}
+        sentinelRef={state.sentinelRef}
       />
     </section>
   );

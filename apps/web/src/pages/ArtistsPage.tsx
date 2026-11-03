@@ -8,10 +8,11 @@ import { SortableTh } from '../components/catalog/SortableTh';
 import { TableBodySkeleton } from '../components/catalog/TableBodySkeleton';
 import { PageHeader } from '../components/layout/PageHeader';
 import { buttonVariants } from '../components/ui/button';
-import { useDebouncedCatalogQuery } from '../hooks/useDebouncedCatalogQuery';
+import { useInfiniteCatalogQuery } from '../hooks/useInfiniteCatalogQuery';
 import { api } from '../lib/api';
 import {
   type ArtistSortBy,
+  CATALOG_PAGE_SIZE,
   type CatalogArtist,
   formatRating,
   type SortOrder,
@@ -24,18 +25,23 @@ export function ArtistsPage() {
   const [sortBy, setSortBy] = useState<ArtistSortBy>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  const state = useDebouncedCatalogQuery({
+  const state = useInfiniteCatalogQuery({
     deps: [search, sortBy, sortOrder],
     errorMessage: 'Could not load artists',
-    load: async () => {
-      const res = await api.get<{ artists: CatalogArtist[] }>('/artists', {
+    loadPage: async (offset) => {
+      const res = await api.get<{
+        artists: CatalogArtist[];
+        hasMore: boolean;
+      }>('/artists', {
         params: {
           q: search.trim() || undefined,
           sortBy,
           sortOrder,
+          limit: CATALOG_PAGE_SIZE,
+          offset,
         },
       });
-      return res.data.artists;
+      return { items: res.data.artists, hasMore: res.data.hasMore };
     },
   });
 
@@ -44,6 +50,8 @@ export function ArtistsPage() {
     setSortBy(next.sortBy);
     setSortOrder(next.sortOrder);
   }
+
+  const showRows = state.status === 'ready' || state.status === 'loadingMore';
 
   return (
     <section className="flex flex-col gap-6">
@@ -121,7 +129,7 @@ export function ArtistsPage() {
               </tr>
             ) : null}
 
-            {state.status === 'ready' && state.data.length === 0 ? (
+            {showRows && state.items.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
@@ -132,8 +140,8 @@ export function ArtistsPage() {
               </tr>
             ) : null}
 
-            {state.status === 'ready'
-              ? state.data.map((artist) => (
+            {showRows
+              ? state.items.map((artist) => (
                   <tr
                     key={artist.id}
                     className="transition-colors odd:bg-transparent even:bg-[var(--cadence-muted)]/20 hover:bg-[var(--cadence-muted)]/45"
@@ -167,6 +175,16 @@ export function ArtistsPage() {
                   </tr>
                 ))
               : null}
+
+            {state.status === 'loadingMore' ? (
+              <TableBodySkeleton columns={5} rows={3} />
+            ) : null}
+
+            {showRows && state.hasMore ? (
+              <tr ref={state.sentinelRef} aria-hidden="true">
+                <td colSpan={5} className="h-1 p-0" />
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>

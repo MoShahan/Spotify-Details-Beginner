@@ -43,6 +43,9 @@ export type SongSortBy = 'name' | 'rating' | 'releaseYear' | 'album';
 export type ArtistSortBy = 'name' | 'rating' | 'dob';
 export type SortOrder = 'asc' | 'desc';
 
+/** Page size for artists/songs infinite lists. */
+export const CATALOG_PAGE_SIZE = 10;
+
 export function formatRating(value: number | null): string {
   if (value === null) {
     return '-';

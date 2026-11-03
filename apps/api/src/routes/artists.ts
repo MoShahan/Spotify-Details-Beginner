@@ -38,7 +38,7 @@ artistsRouter.get('/top', requireAuth, async (_req, res, next) => {
 
 /**
  * List artists (auth). Includes averages.
- * Query: `q`, `sortBy` (name|rating|dob), `sortOrder` (asc|desc).
+ * Query: `q`, `sortBy`, `sortOrder`, `limit` (default 20), `offset` (default 0).
  */
 artistsRouter.get(
   '/',
@@ -47,14 +47,13 @@ artistsRouter.get(
   async (req, res, next) => {
     try {
       const query = req.query as unknown as ListArtistsQuery;
-      const artists = await listArtists(query);
-      res.status(200).json({ artists });
+      const page = await listArtists(query);
+      res.status(200).json(page);
     } catch (error: unknown) {
       next(error);
     }
   },
 );
-
 /**
  * Create artist (auth).
  * Current rule (API, not DB unique): reject duplicate names with 409.

@@ -29,6 +29,7 @@ describe('GET /songs', () => {
 
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body.songs)).toBe(true);
+      expect(typeof res.body.hasMore).toBe('boolean');
       expect(res.body.songs.length).toBeGreaterThan(0);
 
       const wildflower = res.body.songs.find(
@@ -52,4 +53,31 @@ describe('GET /songs', () => {
       );
     },
   );
+
+  it.skipIf(!hasDatabase)('paginates with limit and offset', async () => {
+    const login = await request(app).post('/auth/login').send({
+      email: 'shahan@cadence.com',
+      password: 'Shahan@123',
+    });
+    expect(login.status).toBe(200);
+    const token = login.body.token as string;
+
+    const first = await request(app)
+      .get('/songs')
+      .query({ limit: 2, offset: 0, sortBy: 'name', sortOrder: 'asc' })
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(first.status).toBe(200);
+    expect(first.body.songs).toHaveLength(2);
+    expect(first.body.hasMore).toBe(true);
+
+    const second = await request(app)
+      .get('/songs')
+      .query({ limit: 2, offset: 2, sortBy: 'name', sortOrder: 'asc' })
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(second.status).toBe(200);
+    expect(second.body.songs).toHaveLength(2);
+    expect(second.body.songs[0].id).not.toBe(first.body.songs[0].id);
+  });
 });
