@@ -19,6 +19,18 @@ const FEATURES = [
 
 const UPCOMING = [
   {
+    title: 'Playlists',
+    body: 'Create your own playlists and add songs to them.',
+  },
+  {
+    title: 'Reset / forgot password',
+    body: 'Request a password reset and choose a new password.',
+  },
+  {
+    title: 'Song links',
+    body: 'YouTube, Deezer, and Spotify links on each song.',
+  },
+  {
     title: 'Lyrics',
     body: 'Full lyrics on song detail (placeholder is live today).',
   },

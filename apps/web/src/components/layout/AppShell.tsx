@@ -1,4 +1,13 @@
-import { Disc3, Home, Info, LogOut, Menu, Users, X } from 'lucide-react';
+import {
+  Disc3,
+  Home,
+  Info,
+  ListMusic,
+  LogOut,
+  Menu,
+  Users,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 
@@ -48,6 +57,10 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       <NavLink to="/artists" className={navLinkClass} onClick={onNavigate}>
         <Users className="size-4 shrink-0" aria-hidden />
         Artists
+      </NavLink>
+      <NavLink to="/playlists" className={navLinkClass} onClick={onNavigate}>
+        <ListMusic className="size-4 shrink-0" aria-hidden />
+        Playlists
       </NavLink>
       <NavLink to="/about" className={navLinkClass} onClick={onNavigate}>
         <Info className="size-4 shrink-0" aria-hidden />

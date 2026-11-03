@@ -13,6 +13,7 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NewArtistPage } from './pages/NewArtistPage';
 import { NewSongPage } from './pages/NewSongPage';
+import { PlaylistsPage } from './pages/PlaylistsPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { SongDetailPage } from './pages/SongDetailPage';
 import { SongsPage } from './pages/SongsPage';
@@ -32,6 +33,7 @@ export default function App() {
                 <Route path="/artists" element={<ArtistsPage />} />
                 <Route path="/artists/new" element={<NewArtistPage />} />
                 <Route path="/artists/:id" element={<ArtistDetailPage />} />
+                <Route path="/playlists" element={<PlaylistsPage />} />
               </Route>
               <Route path="/about" element={<AboutPage />} />
               <Route path="/login" element={<LoginPage />} />
