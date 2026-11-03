@@ -31,8 +31,10 @@ export function LoginPage() {
     defaultValues: { email: '', password: '' },
   });
 
+  // Use `from` (not hard-coded `/`) so a successful login that flips
+  // `isAuthenticated` cannot race past navigate(from) back to Home.
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={from} replace />;
   }
 
   async function onSubmit(values: LoginFormValues) {
