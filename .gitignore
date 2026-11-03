@@ -1,7 +1,3 @@
-# Local planning / checklist (not for remote)
-plan.md
-TODO.md
-
 # Dependencies
 node_modules/
 **/node_modules/
